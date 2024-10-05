@@ -1,6 +1,6 @@
 import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
-import 'package:acesso_mapeado/shared/app_colors.dart';
+import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingPage extends StatelessWidget {
@@ -35,8 +35,7 @@ class OnboardingPage extends StatelessWidget {
                       TextSpan(
                         text: ' Acesso Mapeado.',
                         style: TextStyle(
-                          color: AppColors
-                              .lightPurple, 
+                          color: AppColors.lightPurple,
                         ),
                       ),
                       TextSpan(
@@ -54,7 +53,8 @@ class OnboardingPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const SignInPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignInPage()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -97,8 +97,7 @@ class OnboardingPage extends StatelessWidget {
                 children: [
                   const Text('Esqueceu a senha?'),
                   TextButton(
-                    onPressed: () {
-                    },
+                    onPressed: () {},
                     child: const Text(
                       'Redefinir senha',
                       style: TextStyle(

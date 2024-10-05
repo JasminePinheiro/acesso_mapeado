@@ -1,7 +1,7 @@
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
-import 'package:acesso_mapeado/shared/app_colors.dart';
+import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
