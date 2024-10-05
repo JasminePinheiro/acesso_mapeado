@@ -1,11 +1,14 @@
+import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
-import 'package:acesso_mapeado/shared/app_colors.dart';
+import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class RatePage extends StatefulWidget {
-  const RatePage({super.key});
+  const RatePage({super.key, required this.company});
+
+  final CompanyModel company;
 
   @override
   State<RatePage> createState() => _RatePageState();
@@ -15,7 +18,6 @@ class _RatePageState extends State<RatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
         flexibleSpace: Container(
@@ -39,20 +41,22 @@ class _RatePageState extends State<RatePage> {
             );
           },
         ),
-        title: const Row(
+        title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: AssetImage('assets/images/img-company.png'),
+              backgroundImage: NetworkImage(widget.company.imageUrl ?? ''),
               radius: 25,
             ),
-            SizedBox(width: 14),
+            const SizedBox(width: 14),
             Text(
-              'Nome da empresa',
-              style: TextStyle(color: AppColors.lightPurple, fontSize: 18),
+              'Avaliar ${widget.company.name}',
+              style:
+                  const TextStyle(color: AppColors.lightPurple, fontSize: 18),
             ),
           ],
         ),
       ),
+      backgroundColor: AppColors.white,
       body: Column(
         children: [
           const SizedBox(height: 10),
