@@ -1,9 +1,6 @@
 import 'dart:io';
 
-import 'package:acesso_mapeado/pages/home_page.dart';
-import 'package:acesso_mapeado/pages/ranking_page.dart';
-import 'package:acesso_mapeado/shared/app_colors.dart';
-import 'package:acesso_mapeado/shared/app_navbar.dart';
+import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,8 +12,6 @@ class ProfileUserPage extends StatefulWidget {
 }
 
 class _ProfileUserPageState extends State<ProfileUserPage> {
-  int _selectedIndex = 3;
-
   File? imageFile;
 
   // final ImagePicker _picker = ImagePicker();
@@ -33,43 +28,12 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   // }
 
   pick(ImageSource source) async {
-   final pickedFile = await imagePicker.pickImage(source: source);
-   
-   if (pickedFile != null) {
-     setState(() {
-       imageFile = File(pickedFile.path);
-     });
-   }   
+    final pickedFile = await imagePicker.pickImage(source: source);
 
-  }
-
-  void _navigate(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-        break;
-      case 1:
-        // Navegar para o bate-papo
-        break;
-      case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const RankingPage()),
-        );
-        break;
-      case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfileUserPage()),
-        );
-        break;
+    if (pickedFile != null) {
+      setState(() {
+        imageFile = File(pickedFile.path);
+      });
     }
   }
 
@@ -77,28 +41,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        title: const Text('Editar Perfil'),
-        backgroundColor: AppColors.white,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(color: AppColors.white, boxShadow: [
-            BoxShadow(
-                color: AppColors.darkGray.withOpacity(0.2),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(0, 2))
-          ]),
-        ),
-        leading: IconButton(
-          icon: Image.asset('assets/icons/arrow-left.png'),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
-          },
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -116,7 +58,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                           backgroundImage: imageFile != null
                               ? FileImage(
                                   imageFile!) // Mostrar a imagem selecionada
-                              : AssetImage('assets/images/placeholder-user.png')
+                              : const AssetImage(
+                                      'assets/images/placeholder-user.png')
                                   as ImageProvider, // Imagem padrão
                         ),
                         Positioned(
@@ -271,8 +214,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
           ],
         ),
       ),
-      bottomNavigationBar:
-          AppNavbar(selectedIndex: _selectedIndex, onItemTapped: _navigate),
     );
   }
 
