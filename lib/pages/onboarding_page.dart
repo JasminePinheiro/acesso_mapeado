@@ -2,6 +2,8 @@ import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_company_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:acesso_mapeado/widgets/color_blind_image.dart';
+
 import 'package:flutter/material.dart';
 
 class OnboardingPage extends StatelessWidget {
@@ -19,15 +21,18 @@ class OnboardingPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 55),
-              Image.asset('assets/images/img-accessibility.png', height: 350),
+              const ColorBlindImage(
+                imageProvider:
+                    AssetImage('assets/images/img-accessibility.png'),
+              ),
               const SizedBox(height: 35),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 18.0),
                 child: RichText(
                   textAlign: TextAlign.center,
-                  text: const TextSpan(
+                  text: TextSpan(
                     text: 'Bem-vindo ao',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.black,
@@ -36,10 +41,10 @@ class OnboardingPage extends StatelessWidget {
                       TextSpan(
                         text: ' Acesso Mapeado.',
                         style: TextStyle(
-                          color: AppColors.lightPurple,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
-                      TextSpan(
+                      const TextSpan(
                         text: ' Juntos por um mundo mais inclusivo!',
                         style: TextStyle(color: Colors.black),
                       ),
@@ -59,7 +64,6 @@ class OnboardingPage extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.lightPurple,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24.0, vertical: 12.0),
                     textStyle: const TextStyle(
@@ -88,8 +92,8 @@ class OnboardingPage extends StatelessWidget {
                     child: const Text(
                       'Cadastre-se',
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.lightPurple),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -107,8 +111,8 @@ class OnboardingPage extends StatelessWidget {
                     child: const Text(
                       'Sou uma empresa',
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.lightPurple),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   )
                 ],

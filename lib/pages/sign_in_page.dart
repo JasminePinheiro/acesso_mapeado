@@ -5,6 +5,7 @@ import 'package:acesso_mapeado/pages/company_home_page.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
+
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,10 +24,14 @@ class _SignInPageState extends State<SignInPage> {
   bool _isPasswordVisible = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final UserController _userController = UserController(
-    auth: FirebaseAuth.instance,
-    firestore: FirebaseFirestore.instance,
-  );
+
+  late UserController _userController;
+
+  @override
+  void initState() {
+    super.initState();
+    _userController = Provider.of<UserController>(context, listen: false);
+  }
 
   Future<void> _signIn() async {
     try {
@@ -86,12 +91,15 @@ class _SignInPageState extends State<SignInPage> {
           ),
           title: const Row(
             children: [
-              Icon(Icons.error_outline, color: Colors.red),
+              Icon(
+                Icons.error_outline,
+              ),
               SizedBox(width: 8),
               Text(
                 'Erro',
-                style:
-                    TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -111,7 +119,6 @@ class _SignInPageState extends State<SignInPage> {
                 'OK',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.lightPurple,
                 ),
               ),
             ),
@@ -182,11 +189,11 @@ class _SignInPageState extends State<SignInPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text(
+              child: Text(
                 'OK',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.lightPurple,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -278,9 +285,7 @@ class _SignInPageState extends State<SignInPage> {
                             _resetPassword, // Chama a função de redefinição de senha
                         child: const Text(
                           'Esqueci a senha?',
-                          style: TextStyle(
-                              color: AppColors.lightPurple,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -288,17 +293,14 @@ class _SignInPageState extends State<SignInPage> {
                   const SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: _signIn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.lightPurple,
-                      padding: const EdgeInsets.symmetric(
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
                           horizontal: 24.0, vertical: 12.0),
-                    ),
-                    child: const Text(
-                      'Entrar',
-                      style: TextStyle(
-                          color: AppColors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
+                      child: Text(
+                        'Entrar',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 45),
@@ -317,8 +319,8 @@ class _SignInPageState extends State<SignInPage> {
                         child: const Text(
                           'Cadastre-se',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.lightPurple),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],

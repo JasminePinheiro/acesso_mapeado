@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:acesso_mapeado/widgets/color_blind_image.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
@@ -19,10 +18,6 @@ class RankingPage extends StatefulWidget {
 }
 
 class _RankingPageState extends State<RankingPage> {
-  final CompanyController _companyController = CompanyController(
-    auth: FirebaseAuth.instance,
-    firestore: FirebaseFirestore.instance,
-  );
   List<CompanyModel> rankedCompanies = [];
   bool _isLoading = true;
 
@@ -55,7 +50,9 @@ class _RankingPageState extends State<RankingPage> {
 
   Future<void> _fetchRankedCompanies() async {
     try {
-      rankedCompanies = await _companyController.getAllCompaniesOrderByRating();
+      rankedCompanies =
+          await Provider.of<CompanyController>(context, listen: false)
+              .getAllCompaniesOrderByRating();
     } catch (e) {
       Logger.logInfo('Error fetching ranked companies: $e');
     } finally {
@@ -101,12 +98,17 @@ class _RankingPageState extends State<RankingPage> {
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 12.0),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundImage: company.imageUrl != null
-              ? MemoryImage(base64Decode(company.imageUrl!.split(',')[1]))
-              : const AssetImage('assets/images/img-company.png')
-                  as ImageProvider,
-          radius: 25,
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(64),
+          child: ColorBlindImage(
+            imageProvider: company.imageUrl != null
+                ? MemoryImage(base64Decode(company.imageUrl!.split(',')[1]))
+                : const AssetImage('assets/images/img-company.png')
+                    as ImageProvider,
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
         ),
         title: Text(
           '${index + 1}. ${company.name}',
@@ -120,7 +122,7 @@ class _RankingPageState extends State<RankingPage> {
             return Icon(
               Icons.star,
               color: starIndex < (company.rating ?? 0)
-                  ? AppColors.yellow
+                  ? Theme.of(context).colorScheme.primary
                   : Colors.grey[300],
               size: 18,
             );
@@ -132,8 +134,8 @@ class _RankingPageState extends State<RankingPage> {
           children: [
             Text(
               distance,
-              style: const TextStyle(
-                color: Color.fromARGB(255, 203, 5, 128),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -147,32 +149,6 @@ class _RankingPageState extends State<RankingPage> {
     );
   }
 
-  // Widget _buildInfoButton() {
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       border: Border.all(color: AppColors.lightPurple),
-  //       borderRadius: BorderRadius.circular(20),
-  //     ),
-  //     child: const Padding(
-  //       padding: EdgeInsets.all(8.0),
-  //       child: Row(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Icon(
-  //             Icons.info,
-  //             color: AppColors.lightPurple,
-  //           ),
-  //           SizedBox(width: 5),
-  //           Text(
-  //             'Saiba mais',
-  //             style: TextStyle(color: AppColors.lightPurple),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,13 +157,16 @@ class _RankingPageState extends State<RankingPage> {
           ? _buildLoadingIndicator()
           : rankedCompanies.isEmpty
               ? _buildEmptyMessage()
-              : ListView.builder(
-                  padding: const EdgeInsets.only(top: 14),
-                  itemCount: rankedCompanies.length,
-                  itemBuilder: (context, index) {
-                    final company = rankedCompanies[index];
-                    return _buildCompanyCard(company, index);
-                  },
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(top: 14),
+                    itemCount: rankedCompanies.length,
+                    itemBuilder: (context, index) {
+                      final company = rankedCompanies[index];
+                      return _buildCompanyCard(company, index);
+                    },
+                  ),
                 ),
     );
   }

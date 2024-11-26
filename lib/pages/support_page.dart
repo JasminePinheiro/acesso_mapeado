@@ -100,7 +100,8 @@ class _SupportPageState extends State<SupportPage> {
                       child: ElevatedButton(
                         onPressed: _sendSupportMessage,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.lightPurple,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 12.0),
                           textStyle: const TextStyle(

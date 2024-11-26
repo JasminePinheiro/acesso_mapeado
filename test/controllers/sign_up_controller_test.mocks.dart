@@ -4,13 +4,14 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i7;
-import 'dart:io' as _i19;
-import 'dart:typed_data' as _i12;
-import 'dart:ui' as _i14;
+import 'dart:io' as _i20;
+import 'dart:typed_data' as _i13;
+import 'dart:ui' as _i15;
 
-import 'package:acesso_mapeado/controllers/user_controller.dart' as _i16;
-import 'package:acesso_mapeado/models/company_model.dart' as _i18;
-import 'package:acesso_mapeado/models/user_model.dart' as _i13;
+import 'package:acesso_mapeado/controllers/user_controller.dart' as _i17;
+import 'package:acesso_mapeado/models/company_model.dart' as _i19;
+import 'package:acesso_mapeado/models/user_model.dart' as _i14;
+import 'package:acesso_mapeado/shared/color_blindness_type.dart' as _i11;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i6;
 import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart'
     as _i5;
@@ -21,10 +22,10 @@ import 'package:firebase_core/firebase_core.dart' as _i2;
 import 'package:flutter/foundation.dart' as _i9;
 import 'package:flutter/material.dart' as _i8;
 import 'package:flutter/src/widgets/framework.dart' as _i10;
-import 'package:flutter/src/widgets/notification_listener.dart' as _i15;
-import 'package:google_maps_flutter/google_maps_flutter.dart' as _i17;
+import 'package:flutter/src/widgets/notification_listener.dart' as _i16;
+import 'package:google_maps_flutter/google_maps_flutter.dart' as _i18;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i11;
+import 'package:mockito/src/dummies.dart' as _i12;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -342,9 +343,20 @@ class _FakeFirebaseAuth_26 extends _i1.SmartFake implements _i4.FirebaseAuth {
         );
 }
 
-class _FakeScaffoldMessengerState_27 extends _i1.SmartFake
+class _FakeProviderColorBlindnessType_27 extends _i1.SmartFake
+    implements _i11.ProviderColorBlindnessType {
+  _FakeProviderColorBlindnessType_27(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeScaffoldMessengerState_28 extends _i1.SmartFake
     implements _i8.ScaffoldMessengerState {
-  _FakeScaffoldMessengerState_27(
+  _FakeScaffoldMessengerState_28(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -357,9 +369,9 @@ class _FakeScaffoldMessengerState_27 extends _i1.SmartFake
       super.toString();
 }
 
-class _FakeStatefulElement_28 extends _i1.SmartFake
+class _FakeStatefulElement_29 extends _i1.SmartFake
     implements _i10.StatefulElement {
-  _FakeStatefulElement_28(
+  _FakeStatefulElement_29(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -844,7 +856,7 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
           #verifyPasswordResetCode,
           [code],
         ),
-        returnValue: _i7.Future<String>.value(_i11.dummyValue<String>(
+        returnValue: _i7.Future<String>.value(_i12.dummyValue<String>(
           this,
           Invocation.method(
             #verifyPasswordResetCode,
@@ -929,7 +941,7 @@ class MockFirebaseFirestore extends _i1.Mock implements _i6.FirebaseFirestore {
   @override
   String get databaseURL => (super.noSuchMethod(
         Invocation.getter(#databaseURL),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#databaseURL),
         ),
@@ -947,7 +959,7 @@ class MockFirebaseFirestore extends _i1.Mock implements _i6.FirebaseFirestore {
   @override
   String get databaseId => (super.noSuchMethod(
         Invocation.getter(#databaseId),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#databaseId),
         ),
@@ -1041,7 +1053,7 @@ class MockFirebaseFirestore extends _i1.Mock implements _i6.FirebaseFirestore {
       ) as _i7.Future<void>);
 
   @override
-  _i6.LoadBundleTask loadBundle(_i12.Uint8List? bundle) => (super.noSuchMethod(
+  _i6.LoadBundleTask loadBundle(_i13.Uint8List? bundle) => (super.noSuchMethod(
         Invocation.method(
           #loadBundle,
           [bundle],
@@ -1207,8 +1219,8 @@ class MockFirebaseFirestore extends _i1.Mock implements _i6.FirebaseFirestore {
             #maxAttempts: maxAttempts,
           },
         ),
-        returnValue: _i11.ifNotNull(
-              _i11.dummyValueOrNull<T>(
+        returnValue: _i12.ifNotNull(
+              _i12.dummyValueOrNull<T>(
                 this,
                 Invocation.method(
                   #runTransaction,
@@ -1297,7 +1309,7 @@ class MockCollectionReference<T extends Object?> extends _i1.Mock
   @override
   String get id => (super.noSuchMethod(
         Invocation.getter(#id),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#id),
         ),
@@ -1306,7 +1318,7 @@ class MockCollectionReference<T extends Object?> extends _i1.Mock
   @override
   String get path => (super.noSuchMethod(
         Invocation.getter(#path),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#path),
         ),
@@ -1799,7 +1811,7 @@ class MockDocumentReference<T extends Object?> extends _i1.Mock
   @override
   String get id => (super.noSuchMethod(
         Invocation.getter(#id),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#id),
         ),
@@ -1817,7 +1829,7 @@ class MockDocumentReference<T extends Object?> extends _i1.Mock
   @override
   String get path => (super.noSuchMethod(
         Invocation.getter(#path),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#path),
         ),
@@ -2014,7 +2026,7 @@ class MockUser extends _i1.Mock implements _i4.User {
   @override
   String get uid => (super.noSuchMethod(
         Invocation.getter(#uid),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#uid),
         ),
@@ -2352,7 +2364,7 @@ class MockUserCredential extends _i1.Mock implements _i4.UserCredential {
 /// A class which mocks [UserModel].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUserModel extends _i1.Mock implements _i13.UserModel {
+class MockUserModel extends _i1.Mock implements _i14.UserModel {
   MockUserModel() {
     _i1.throwOnMissingStub(this);
   }
@@ -2360,7 +2372,7 @@ class MockUserModel extends _i1.Mock implements _i13.UserModel {
   @override
   String get name => (super.noSuchMethod(
         Invocation.getter(#name),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#name),
         ),
@@ -2369,7 +2381,7 @@ class MockUserModel extends _i1.Mock implements _i13.UserModel {
   @override
   String get email => (super.noSuchMethod(
         Invocation.getter(#email),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#email),
         ),
@@ -2384,7 +2396,7 @@ class MockUserModel extends _i1.Mock implements _i13.UserModel {
   @override
   String get cpf => (super.noSuchMethod(
         Invocation.getter(#cpf),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#cpf),
         ),
@@ -2529,7 +2541,7 @@ class MockFormState extends _i1.Mock implements _i8.FormState {
       );
 
   @override
-  void setState(_i14.VoidCallback? fn) => super.noSuchMethod(
+  void setState(_i15.VoidCallback? fn) => super.noSuchMethod(
         Invocation.method(
           #setState,
           [fn],
@@ -2593,7 +2605,7 @@ class MockFormState extends _i1.Mock implements _i8.FormState {
           #toStringShort,
           [],
         ),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.method(
             #toStringShort,
@@ -2652,7 +2664,7 @@ class MockDocumentSnapshot<T extends Object?> extends _i1.Mock
   @override
   String get id => (super.noSuchMethod(
         Invocation.getter(#id),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#id),
         ),
@@ -2765,7 +2777,7 @@ class MockBuildContext extends _i1.Mock implements _i10.BuildContext {
       );
 
   @override
-  void dispatchNotification(_i15.Notification? notification) =>
+  void dispatchNotification(_i16.Notification? notification) =>
       super.noSuchMethod(
         Invocation.method(
           #dispatchNotification,
@@ -3300,7 +3312,7 @@ class MockQueryDocumentSnapshot<T extends Object?> extends _i1.Mock
   @override
   String get id => (super.noSuchMethod(
         Invocation.getter(#id),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.getter(#id),
         ),
@@ -3336,7 +3348,7 @@ class MockQueryDocumentSnapshot<T extends Object?> extends _i1.Mock
           #data,
           [],
         ),
-        returnValue: _i11.dummyValue<T>(
+        returnValue: _i12.dummyValue<T>(
           this,
           Invocation.method(
             #data,
@@ -3361,7 +3373,7 @@ class MockQueryDocumentSnapshot<T extends Object?> extends _i1.Mock
 /// A class which mocks [UserController].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUserController extends _i1.Mock implements _i16.UserController {
+class MockUserController extends _i1.Mock implements _i17.UserController {
   MockUserController() {
     _i1.throwOnMissingStub(this);
   }
@@ -3403,6 +3415,16 @@ class MockUserController extends _i1.Mock implements _i16.UserController {
       );
 
   @override
+  _i11.ProviderColorBlindnessType get providerColorBlindnessType =>
+      (super.noSuchMethod(
+        Invocation.getter(#providerColorBlindnessType),
+        returnValue: _FakeProviderColorBlindnessType_27(
+          this,
+          Invocation.getter(#providerColorBlindnessType),
+        ),
+      ) as _i11.ProviderColorBlindnessType);
+
+  @override
   bool get isAuthenticated => (super.noSuchMethod(
         Invocation.getter(#isAuthenticated),
         returnValue: false,
@@ -3415,10 +3437,19 @@ class MockUserController extends _i1.Mock implements _i16.UserController {
       ) as bool);
 
   @override
-  void setUserPosition(_i17.LatLng? position) => super.noSuchMethod(
+  void setUserPosition(_i18.LatLng? position) => super.noSuchMethod(
         Invocation.method(
           #setUserPosition,
           [position],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void setColorBlindnessTypeFromRemoteConfig() => super.noSuchMethod(
+        Invocation.method(
+          #setColorBlindnessTypeFromRemoteConfig,
+          [],
         ),
         returnValueForMissingStub: null,
       );
@@ -3433,7 +3464,7 @@ class MockUserController extends _i1.Mock implements _i16.UserController {
       );
 
   @override
-  void updateCompanyModel(_i18.CompanyModel? companyModel) =>
+  void updateCompanyModel(_i19.CompanyModel? companyModel) =>
       super.noSuchMethod(
         Invocation.method(
           #updateCompanyModel,
@@ -3443,7 +3474,7 @@ class MockUserController extends _i1.Mock implements _i16.UserController {
       );
 
   @override
-  void updateUserModel(_i13.UserModel? userModel) => super.noSuchMethod(
+  void updateUserModel(_i14.UserModel? userModel) => super.noSuchMethod(
         Invocation.method(
           #updateUserModel,
           [userModel],
@@ -3506,7 +3537,7 @@ class MockUserController extends _i1.Mock implements _i16.UserController {
       ) as _i7.Future<void>);
 
   @override
-  _i7.Future<void> updateProfilePhoto(_i19.File? imageFile) =>
+  _i7.Future<void> updateProfilePhoto(_i20.File? imageFile) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateProfilePhoto,
@@ -3527,13 +3558,13 @@ class MockUserController extends _i1.Mock implements _i16.UserController {
       ) as _i7.Future<void>);
 
   @override
-  _i7.Future<_i13.UserModel?> loadUserProfile() => (super.noSuchMethod(
+  _i7.Future<_i14.UserModel?> loadUserProfile() => (super.noSuchMethod(
         Invocation.method(
           #loadUserProfile,
           [],
         ),
-        returnValue: _i7.Future<_i13.UserModel?>.value(),
-      ) as _i7.Future<_i13.UserModel?>);
+        returnValue: _i7.Future<_i14.UserModel?>.value(),
+      ) as _i7.Future<_i14.UserModel?>);
 
   @override
   _i7.Future<void> loadCompanyProfile() => (super.noSuchMethod(
@@ -3555,7 +3586,7 @@ class MockUserController extends _i1.Mock implements _i16.UserController {
       ) as _i7.Future<bool>);
 
   @override
-  void addListener(_i14.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i15.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -3564,7 +3595,7 @@ class MockUserController extends _i1.Mock implements _i16.UserController {
       );
 
   @override
-  void removeListener(_i14.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i15.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -3614,7 +3645,7 @@ class MockScaffoldMessenger extends _i1.Mock implements _i8.ScaffoldMessenger {
           #createState,
           [],
         ),
-        returnValue: _FakeScaffoldMessengerState_27(
+        returnValue: _FakeScaffoldMessengerState_28(
           this,
           Invocation.method(
             #createState,
@@ -3629,7 +3660,7 @@ class MockScaffoldMessenger extends _i1.Mock implements _i8.ScaffoldMessenger {
           #createElement,
           [],
         ),
-        returnValue: _FakeStatefulElement_28(
+        returnValue: _FakeStatefulElement_29(
           this,
           Invocation.method(
             #createElement,
@@ -3644,7 +3675,7 @@ class MockScaffoldMessenger extends _i1.Mock implements _i8.ScaffoldMessenger {
           #toStringShort,
           [],
         ),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.method(
             #toStringShort,
@@ -3677,7 +3708,7 @@ class MockScaffoldMessenger extends _i1.Mock implements _i8.ScaffoldMessenger {
             #minLevel: minLevel,
           },
         ),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.method(
             #toStringShallow,
@@ -3706,7 +3737,7 @@ class MockScaffoldMessenger extends _i1.Mock implements _i8.ScaffoldMessenger {
             #minLevel: minLevel,
           },
         ),
-        returnValue: _i11.dummyValue<String>(
+        returnValue: _i12.dummyValue<String>(
           this,
           Invocation.method(
             #toStringDeep,

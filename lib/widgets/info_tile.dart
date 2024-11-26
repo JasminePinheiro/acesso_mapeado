@@ -17,11 +17,12 @@ class InfoTile extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.lightPurple),
+          Icon(icon, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8.0),
           Expanded(
             child: Text(
               text,
+              semanticsLabel: '',
               style: const TextStyle(
                 fontSize: 16,
                 color: AppColors.darkGray,

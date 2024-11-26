@@ -2365,6 +2365,69 @@ class MockCompanyModel extends _i1.Mock implements _i10.CompanyModel {
       );
 
   @override
+  String get fullAddress => (super.noSuchMethod(
+        Invocation.getter(#fullAddress),
+        returnValue: _i8.dummyValue<String>(
+          this,
+          Invocation.getter(#fullAddress),
+        ),
+      ) as String);
+
+  @override
+  set fullAddress(String? _fullAddress) => super.noSuchMethod(
+        Invocation.setter(
+          #fullAddress,
+          _fullAddress,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set number(String? _number) => super.noSuchMethod(
+        Invocation.setter(
+          #number,
+          _number,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set city(String? _city) => super.noSuchMethod(
+        Invocation.setter(
+          #city,
+          _city,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set state(String? _state) => super.noSuchMethod(
+        Invocation.setter(
+          #state,
+          _state,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set neighborhood(String? _neighborhood) => super.noSuchMethod(
+        Invocation.setter(
+          #neighborhood,
+          _neighborhood,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set zipCode(String? _zipCode) => super.noSuchMethod(
+        Invocation.setter(
+          #zipCode,
+          _zipCode,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   set imageUrl(String? _imageUrl) => super.noSuchMethod(
         Invocation.setter(
           #imageUrl,
@@ -2387,6 +2450,78 @@ class MockCompanyModel extends _i1.Mock implements _i10.CompanyModel {
         Invocation.setter(
           #phoneNumber,
           _phoneNumber,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set instagramUrl(String? _instagramUrl) => super.noSuchMethod(
+        Invocation.setter(
+          #instagramUrl,
+          _instagramUrl,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set facebookUrl(String? _facebookUrl) => super.noSuchMethod(
+        Invocation.setter(
+          #facebookUrl,
+          _facebookUrl,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set twitterUrl(String? _twitterUrl) => super.noSuchMethod(
+        Invocation.setter(
+          #twitterUrl,
+          _twitterUrl,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set websiteUrl(String? _websiteUrl) => super.noSuchMethod(
+        Invocation.setter(
+          #websiteUrl,
+          _websiteUrl,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set youtubeUrl(String? _youtubeUrl) => super.noSuchMethod(
+        Invocation.setter(
+          #youtubeUrl,
+          _youtubeUrl,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set tiktokUrl(String? _tiktokUrl) => super.noSuchMethod(
+        Invocation.setter(
+          #tiktokUrl,
+          _tiktokUrl,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set pinterestUrl(String? _pinterestUrl) => super.noSuchMethod(
+        Invocation.setter(
+          #pinterestUrl,
+          _pinterestUrl,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  set linkedinUrl(String? _linkedinUrl) => super.noSuchMethod(
+        Invocation.setter(
+          #linkedinUrl,
+          _linkedinUrl,
         ),
         returnValueForMissingStub: null,
       );

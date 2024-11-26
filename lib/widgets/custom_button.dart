@@ -18,18 +18,17 @@ class CustomButton extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        border: Border.all(color: AppColors.lightPurple),
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
         borderRadius: BorderRadius.circular(20),
       ),
       child: TextButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon, color: AppColors.lightPurple),
+        icon: Icon(icon, color: Theme.of(context).colorScheme.primary),
         label: Text(
           label,
-          style: const TextStyle(color: AppColors.lightPurple),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );
   }
 }
-

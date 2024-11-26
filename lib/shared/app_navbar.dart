@@ -32,7 +32,7 @@ class _AppNavbarState extends State<AppNavbar> {
       ),
       child: BottomNavigationBar(
         backgroundColor: AppColors.white,
-        selectedItemColor: AppColors.lightPurple,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: AppColors.lightGray,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

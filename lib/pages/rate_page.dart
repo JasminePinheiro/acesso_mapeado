@@ -6,8 +6,8 @@ import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:acesso_mapeado/widgets/color_blind_image.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,10 +23,7 @@ class RatePage extends StatefulWidget {
 
 class _RatePageState extends State<RatePage> {
   final TextEditingController _comment = TextEditingController();
-  final CompanyController _company = CompanyController(
-    auth: FirebaseAuth.instance,
-    firestore: FirebaseFirestore.instance,
-  );
+
   double _rating = 0;
   List<CompanyModel> companies = [];
   final List<String> _selectedPhotos = [];
@@ -74,10 +71,12 @@ class _RatePageState extends State<RatePage> {
       sending = true;
     });
 
-    bool result = await _company.addUserComment(
-        widget.company.uuid, _comment.text, _rating, context, _selectedPhotos);
+    bool result = await Provider.of<CompanyController>(context, listen: false)
+        .addUserComment(widget.company.uuid, _comment.text, _rating, context,
+            _selectedPhotos);
     bool ratingResult =
-        await _company.addCompanyUserRating(widget.company.uuid, _rating);
+        await Provider.of<CompanyController>(context, listen: false)
+            .addCompanyUserRating(widget.company.uuid, _rating);
     await getCompanies();
 
     if (!mounted) return;
@@ -113,7 +112,8 @@ class _RatePageState extends State<RatePage> {
 
   Future<void> getCompanies() async {
     try {
-      companies = await _company.getAllCompanies();
+      companies = await Provider.of<CompanyController>(context, listen: false)
+          .getAllCompanies();
       Logger.logInfo("Empresas carregadas: ${companies.length}");
 
       if (!mounted) return;
@@ -146,18 +146,23 @@ class _RatePageState extends State<RatePage> {
             ],
           ),
         ),
-        leading: IconButton(
-          icon: Image.asset('assets/icons/arrow-left.png'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        leading: Semantics(
+          label: 'Botão voltar',
+          child: IconButton(
+            icon: Image.asset('assets/icons/arrow-left.png'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
         title: Row(
           children: [
-            Text(
-              'Avaliar ${widget.company.name}',
-              style:
-                  const TextStyle(color: AppColors.lightPurple, fontSize: 18),
+            Semantics(
+              child: Text(
+                'Avaliar ${widget.company.name}',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary, fontSize: 18),
+              ),
             ),
           ],
         ),
@@ -177,59 +182,78 @@ class _RatePageState extends State<RatePage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            Provider.of<UserController>(context)
-                                .userModel!
-                                .name,
-                            style: const TextStyle(
-                                fontSize: 18, color: AppColors.lightPurple),
+                          Semantics(
+                            label: 'Nome do usuário',
+                            child: Text(
+                              Provider.of<UserController>(context)
+                                  .userModel!
+                                  .name,
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
                           ),
                           const SizedBox(height: 4),
-                          const Row(
-                            children: [
-                              Text(
-                                'Sua postagem será pública.',
-                                style: TextStyle(
-                                    fontSize: 14, color: AppColors.darkGray),
-                              ),
-                              Icon(Icons.warning_rounded,
-                                  color: AppColors.lightPurple),
-                            ],
+                          Semantics(
+                            label: 'Aviso de postagem pública',
+                            child: Row(
+                              children: [
+                                const Text(
+                                  'Sua postagem será pública.',
+                                  style: TextStyle(
+                                      fontSize: 14, color: AppColors.darkGray),
+                                ),
+                                Icon(Icons.warning_rounded,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                              ],
+                            ),
                           )
                         ],
                       ),
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: RatingBar.builder(
-                    initialRating: _rating,
-                    minRating: 1,
-                    direction: Axis.horizontal,
-                    allowHalfRating: true,
-                    itemCount: 5,
-                    itemBuilder: (context, _) => const Icon(
-                      Icons.star,
-                      color: Colors.amber,
+                Semantics(
+                  label:
+                      'Barra de avaliação com estrelas. Avaliação atual: $_rating estrelas',
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: RatingBar.builder(
+                      initialRating: _rating,
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      itemCount: 5,
+                      itemBuilder: (context, index) => Semantics(
+                        label:
+                            'Estrela de avaliação para nota ${(index + 1).toString()}',
+                        child: Icon(
+                          Icons.star,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      onRatingUpdate: (rating) {
+                        setState(() {
+                          _rating = rating;
+                        });
+                      },
                     ),
-                    onRatingUpdate: (rating) {
-                      setState(() {
-                        _rating = rating; // Atualizar o rating
-                      });
-                    },
                   ),
                 ),
                 const SizedBox(height: 16.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: TextField(
-                    maxLines: 4,
-                    controller: _comment,
-                    decoration: InputDecoration(
-                      hintText: 'Conte como foi sua experiência neste lugar',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                  child: Semantics(
+                    label: 'Campo de texto para comentário',
+                    hint: 'Digite sua experiência neste lugar',
+                    child: TextField(
+                      maxLines: 4,
+                      controller: _comment,
+                      decoration: InputDecoration(
+                        hintText: 'Conte como foi sua experiência neste lugar',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
                       ),
                     ),
                   ),
@@ -238,109 +262,141 @@ class _RatePageState extends State<RatePage> {
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Column(
                     children: [
-                      TextButton.icon(
-                        onPressed: pickImages,
-                        icon: const Icon(Icons.add_a_photo,
-                            color: AppColors.lightPurple),
-                        label: const Text(
-                          'Adicionar foto',
-                          style: TextStyle(color: AppColors.lightPurple),
+                      Semantics(
+                        label: 'Botão para adicionar fotos',
+                        child: TextButton.icon(
+                          onPressed: pickImages,
+                          icon: Icon(Icons.add_a_photo,
+                              color: Theme.of(context).colorScheme.primary),
+                          label: Text(
+                            'Adicionar foto',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary),
+                          ),
                         ),
                       ),
                       if (_selectedPhotos.isNotEmpty)
-                        Container(
-                          height: 200,
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: _selectedPhotos.length,
-                              itemBuilder: (context, index) {
-                                return Stack(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Image.memory(
-                                        base64Decode(_selectedPhotos[index]
-                                            .split(',')[1]),
-                                        fit: BoxFit.cover,
-                                        width: 200,
-                                        height: 200,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 12,
-                                      left: 12,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _selectedPhotos.removeAt(index);
-                                          });
-                                        },
-                                        child: Container(
-                                          width: 20, // Tamanho ajustado
-                                          height: 20,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.red,
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.black
-                                                    .withOpacity(0.2),
-                                                blurRadius: 10,
-                                                offset: const Offset(0, 5),
+                        Semantics(
+                          label: 'Galeria de fotos selecionadas',
+                          child: Container(
+                            height: 200,
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _selectedPhotos.length,
+                                itemBuilder: (context, index) {
+                                  return Stack(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Semantics(
+                                            label:
+                                                'Foto ${index + 1} selecionada',
+                                            child: ColorBlindImage(
+                                              imageProvider: MemoryImage(
+                                                base64Decode(
+                                                    _selectedPhotos[index]
+                                                        .split(',')[1]),
                                               ),
-                                            ],
-                                          ),
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.close,
-                                              color: AppColors.white,
-                                              size: 18,
-                                              weight: 800,
+                                              width: 200,
+                                              height: 200,
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),
                                       ),
-                                    )
-                                  ],
-                                );
-                              }),
+                                      Positioned(
+                                        top: 12,
+                                        left: 12,
+                                        child: Semantics(
+                                          label: 'Remover foto ${index + 1}',
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedPhotos.removeAt(index);
+                                              });
+                                            },
+                                            child: Container(
+                                              width: 20,
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .error,
+                                                shape: BoxShape.circle,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: AppColors.black
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 10,
+                                                    offset: const Offset(0, 5),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.close,
+                                                  color: AppColors.white,
+                                                  size: 18,
+                                                  weight: 800,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  );
+                                }),
+                          ),
                         )
                     ],
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: sending
-                        ? null
-                        : () {
-                            addCommentAndRating();
-                          },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 48),
-                      backgroundColor: sending
-                          ? AppColors.lightPurple.withOpacity(0.5)
-                          : AppColors.lightPurple,
-                    ),
-                    child: sending
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.white),
-                              strokeWidth: 2.0,
+                  child: Semantics(
+                    label: sending
+                        ? 'Enviando avaliação...'
+                        : 'Botão enviar avaliação',
+                    child: ElevatedButton(
+                      onPressed: sending
+                          ? null
+                          : () {
+                              addCommentAndRating();
+                            },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 48),
+                        backgroundColor: sending
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.5)
+                            : Theme.of(context).colorScheme.primary,
+                      ),
+                      child: sending
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.white),
+                                strokeWidth: 2.0,
+                              ),
+                            )
+                          : const Text(
+                              'Enviar avaliação',
+                              style: TextStyle(
+                                  color: AppColors.white, fontSize: 18),
                             ),
-                          )
-                        : const Text(
-                            'Enviar avaliação',
-                            style:
-                                TextStyle(color: AppColors.white, fontSize: 18),
-                          ),
+                    ),
                   ),
                 ),
               ],

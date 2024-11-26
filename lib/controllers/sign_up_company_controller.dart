@@ -16,10 +16,24 @@ class SignUpCompanyController {
   final TextEditingController emailController;
   final MaskedTextController cnpjController;
   final TextEditingController phoneController;
+  final TextEditingController addressController;
+  final TextEditingController numberController;
+  final TextEditingController neighborhoodController;
+  final TextEditingController cityController;
+  final TextEditingController stateController;
+  final TextEditingController zipCodeController;
   final TextEditingController aboutController;
   final TextEditingController passwordController;
   final TextEditingController confirmPasswordController;
   final TextEditingController workingHoursController;
+  final TextEditingController instagramUrlController;
+  final TextEditingController facebookUrlController;
+  final TextEditingController twitterUrlController;
+  final TextEditingController youtubeUrlController;
+  final TextEditingController tiktokUrlController;
+  final TextEditingController pinterestUrlController;
+  final TextEditingController linkedinUrlController;
+  final TextEditingController websiteUrlController;
 
   SignUpCompanyController({
     required this.formKey,
@@ -27,10 +41,24 @@ class SignUpCompanyController {
     required this.emailController,
     required this.cnpjController,
     required this.phoneController,
+    required this.addressController,
+    required this.numberController,
+    required this.neighborhoodController,
+    required this.cityController,
+    required this.stateController,
+    required this.zipCodeController,
     required this.aboutController,
     required this.passwordController,
     required this.confirmPasswordController,
     required this.workingHoursController,
+    required this.instagramUrlController,
+    required this.facebookUrlController,
+    required this.twitterUrlController,
+    required this.youtubeUrlController,
+    required this.tiktokUrlController,
+    required this.pinterestUrlController,
+    required this.linkedinUrlController,
+    required this.websiteUrlController,
   });
 
   bool isValidCNPJ(String cnpj) {
@@ -70,7 +98,7 @@ class SignUpCompanyController {
   Future<void> signUp(
     BuildContext context,
     Map<String, List<Map<String, dynamic>>> accessibilityData,
-    String address,
+    String fullAddress,
     Map<String, Map<String, String>> workingHoursData, // Novo parâmetro
   ) async {
     if (formKey.currentState!.validate()) {
@@ -160,7 +188,7 @@ class SignUpCompanyController {
           ));
         }
 
-        LatLng? latLong = await getLatLong(address);
+        LatLng? latLong = await getLatLong(fullAddress);
 
         CompanyModel newCompany = CompanyModel(
           uuid: const Uuid().v4(),
@@ -169,8 +197,22 @@ class SignUpCompanyController {
           cnpj: cnpjController.text.replaceAll(RegExp(r'\D'), ''),
           phoneNumber: phoneController.text,
           workingHours: workingHours,
-          address: address,
+          fullAddress: fullAddress,
+          address: addressController.text,
+          number: numberController.text,
+          neighborhood: neighborhoodController.text,
+          city: cityController.text,
+          state: stateController.text,
+          zipCode: zipCodeController.text,
           about: aboutController.text,
+          instagramUrl: instagramUrlController.text,
+          facebookUrl: facebookUrlController.text,
+          twitterUrl: twitterUrlController.text,
+          youtubeUrl: youtubeUrlController.text,
+          tiktokUrl: tiktokUrlController.text,
+          pinterestUrl: pinterestUrlController.text,
+          linkedinUrl: linkedinUrlController.text,
+          websiteUrl: websiteUrlController.text,
           imageUrl: null,
           registrationDate: DateTime.now().toString(),
           accessibilityData: accessibilityModel,
@@ -214,9 +256,9 @@ class SignUpCompanyController {
   }
 }
 
-Future<LatLng?> getLatLong(String address) async {
-  final response = await Dio()
-      .get('https://nominatim.openstreetmap.org/search?q=$address&format=json');
+Future<LatLng?> getLatLong(String fullAddress) async {
+  final response = await Dio().get(
+      'https://nominatim.openstreetmap.org/search?q=$fullAddress&format=json');
 
   if (response.statusCode == 200 && response.data.isNotEmpty) {
     final data = response.data;

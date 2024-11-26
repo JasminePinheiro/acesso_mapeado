@@ -1,5 +1,6 @@
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/comment_model.dart';
+import 'package:color_blindness/color_blindness.dart';
 
 class UserModel {
   final String name;
@@ -11,6 +12,7 @@ class UserModel {
   final List<CommentModel>? commentsData;
   final DateTime dateOfBirth;
   final DateTime registrationDate;
+  final ColorBlindnessType? colorBlindnessType;
 
   UserModel({
     required this.name,
@@ -22,6 +24,7 @@ class UserModel {
     this.commentsData,
     required this.dateOfBirth,
     required this.registrationDate,
+    this.colorBlindnessType,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -41,7 +44,10 @@ class UserModel {
                     .toList()
                 : null,
         dateOfBirth: DateTime.parse(json['dateOfBirth']),
-        registrationDate: DateTime.parse(json['registrationDate']));
+        registrationDate: DateTime.parse(json['registrationDate']),
+        colorBlindnessType: json['colorBlindnessType'] != null
+            ? ColorBlindnessType.values.byName(json['colorBlindnessType'])
+            : null);
   }
 
   Map<String, dynamic> toJson() {
@@ -55,6 +61,7 @@ class UserModel {
       'commentsData': commentsData?.map((item) => item.toJson()).toList(),
       'dateOfBirth': dateOfBirth.toIso8601String(),
       'registrationDate': registrationDate.toIso8601String(),
+      'colorBlindnessType': colorBlindnessType?.name,
     };
   }
 }

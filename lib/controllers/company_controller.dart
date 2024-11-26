@@ -24,7 +24,7 @@ class CompanyController with ChangeNotifier {
   CompanyModel? get companyData => _companyData;
   bool get isLoading => _isLoading;
 
-  Future<void> loadCompanyData() async {
+  Future<CompanyModel?> loadCompanyData() async {
     try {
       final user = auth.currentUser;
       if (user == null) throw Exception('Usuário não autenticado');
@@ -32,13 +32,15 @@ class CompanyController with ChangeNotifier {
       final doc = await _companiesCollection.doc(user.uid).get();
       if (!doc.exists) throw Exception('Empresa não encontrada');
 
-      _companyData = CompanyModel.fromJson(doc.data()!);
+      _companyData = CompanyModel.fromJson(doc.data() as Map<String, dynamic>);
       _isLoading = false;
       notifyListeners();
+      return _companyData;
     } catch (e) {
       Logger.logError('Erro ao carregar dados da empresa: $e');
       _isLoading = false;
       notifyListeners();
+      return null;
     }
   }
 
@@ -46,9 +48,15 @@ class CompanyController with ChangeNotifier {
     required String name,
     required String phoneNumber,
     required String address,
+    required String number,
+    required String neighborhood,
+    required String city,
+    required String state,
+    required String zipCode,
     required String about,
     String? imageBase64,
     required Map<String, dynamic> accessibilityData,
+    required Map<String, dynamic> workingHours,
   }) async {
     try {
       final user = auth.currentUser;
@@ -58,12 +66,21 @@ class CompanyController with ChangeNotifier {
         'name': name,
         'phoneNumber': phoneNumber,
         'address': address,
+        'fullAddress':
+            '$address, $number $neighborhood $city - $state $zipCode',
+        'number': number,
+        'neighborhood': neighborhood,
+        'city': city,
+        'state': state,
+        'zipCode': zipCode,
         'about': about,
         if (imageBase64 != null) 'imageUrl': imageBase64,
         'accessibilityData': accessibilityData,
+        'workingHours': workingHours,
       });
 
-      await loadCompanyData(); // Recarrega os dados após atualização
+      await loadCompanyData();
+      notifyListeners();
       return true;
     } catch (e) {
       Logger.logError('Erro ao atualizar perfil da empresa: $e');

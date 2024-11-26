@@ -1,4 +1,5 @@
 import 'package:acesso_mapeado/models/user_model.dart';
+import 'package:acesso_mapeado/shared/color_blindness_type.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
@@ -20,13 +21,15 @@ import 'user_controller_test.mocks.dart';
   CollectionReference,
   DocumentSnapshot,
   UserCredential,
-  UserModel
+  UserModel,
+  ProviderColorBlindnessType
 ])
 void main() {
   late UserController userController;
   late MockFirebaseAuth mockAuth;
   late MockFirebaseFirestore mockFirestore;
   late MockUser mockUser;
+  late MockProviderColorBlindnessType mockProviderColorBlindnessType;
 
   setUpAll(() async {
     // Inicializar mock do firebase
@@ -38,6 +41,7 @@ void main() {
     mockAuth = MockFirebaseAuth();
     mockFirestore = MockFirebaseFirestore();
     mockUser = MockUser();
+    mockProviderColorBlindnessType = MockProviderColorBlindnessType();
 
     // Configurar comportamentos padrão dos mocks
     when(mockUser.uid).thenReturn('test-uid');
@@ -45,7 +49,10 @@ void main() {
     when(mockAuth.authStateChanges())
         .thenAnswer((_) => Stream.fromIterable([mockUser]));
 
-    userController = UserController(auth: mockAuth, firestore: mockFirestore);
+    userController = UserController(
+        auth: mockAuth,
+        firestore: mockFirestore,
+        providerColorBlindnessType: mockProviderColorBlindnessType);
   });
 
   group('UserController Tests', () {
