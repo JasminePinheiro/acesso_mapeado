@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/models/user_model.dart';
+import 'package:acesso_mapeado/pages/home_page.dart';
+import 'package:acesso_mapeado/pages/sign_up_company_page.dart';
 import 'package:acesso_mapeado/shared/color_blindness_type.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 
@@ -36,6 +38,7 @@ class UserController with ChangeNotifier {
   UserModel? _userModel;
   CompanyModel? _companyModel;
   LatLng? _userPosition;
+  bool _isCompanyView = false;
 
   CompanyModel? get companyModel => _companyModel;
 
@@ -202,6 +205,68 @@ class UserController with ChangeNotifier {
       Logger.logError('Erro ao obter a localização do usuário: $e');
 
       return false;
+    }
+  }
+
+  bool get isCompanyView => _isCompanyView;
+
+  Future<bool> toggleUserView(BuildContext context) async {
+    if (_isCompanyView) {
+      // Switching from company view to user view
+      await loadUserProfile();
+
+      if (!context.mounted) return false;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+
+      _isCompanyView = false;
+      notifyListeners();
+      return false;
+    } else {
+      // Switching from user view to company view
+      // Check if user has a company
+      final companyDoc =
+          await firestore.collection('companies').doc(_user!.uid).get();
+
+      if (!companyDoc.exists) {
+        // Show dialog to create company
+        if (!context.mounted) return false;
+        final shouldCreateCompany = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Criar empresa'),
+            content: const Text(
+                'Você ainda não possui uma empresa cadastrada. Deseja cadastrar agora?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Não'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Sim'),
+              ),
+            ],
+          ),
+        );
+
+        if (shouldCreateCompany == true) {
+          if (!context.mounted) return false;
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SignUpCompanyPage()),
+          );
+          return false;
+        }
+        return false;
+      }
+
+      _companyModel = CompanyModel.fromJson(companyDoc.data()!);
+      _isCompanyView = true;
+      notifyListeners();
+      return true;
     }
   }
 }

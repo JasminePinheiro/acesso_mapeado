@@ -158,6 +158,21 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
+
+              // mudar para a visao de usuario
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildActionButton(
+                      'Alternar para visão de usuário', Icons.person, () {
+                    Provider.of<UserController>(context, listen: false)
+                        .toggleUserView(context);
+                  }),
+                ],
+              ),
+              const SizedBox(height: 20),
+
               // Botões de Ação
               Semantics(
                 label: 'Ações disponíveis',

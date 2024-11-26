@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
+import 'package:acesso_mapeado/pages/company_home_page.dart';
+import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/support_page.dart';
 import 'package:acesso_mapeado/shared/color_blindness_type.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
@@ -830,7 +832,36 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 45),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildActionButton(
+                    Icons.business,
+                    'Alternar para visão de empresa',
+                    () async {
+                      final success = await Provider.of<UserController>(context,
+                              listen: false)
+                          .toggleUserView(context);
+                      if (success && mounted) {
+                        // Redirect to appropriate page
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                Provider.of<UserController>(context)
+                                        .isCompanyView
+                                    ? const CompanyHomePage()
+                                    : const HomePage(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
               _buildColorBlindnessSection(),
               const SizedBox(height: 20),
 

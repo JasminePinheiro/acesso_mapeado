@@ -1,5 +1,5 @@
 import 'package:acesso_mapeado/pages/sign_in_page.dart';
-import 'package:acesso_mapeado/pages/sign_up_company_page.dart';
+
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/widgets/color_blind_image.dart';
@@ -98,25 +98,6 @@ class OnboardingPage extends StatelessWidget {
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SignUpCompanyPage()));
-                    },
-                    child: const Text(
-                      'Sou uma empresa',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                ],
-              )
             ],
           ),
         ),

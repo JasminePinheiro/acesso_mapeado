@@ -4,7 +4,6 @@ import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,33 +23,40 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _initApp() async {
+    await checkUserAndRedirect();
+  }
+
+  Future<void> checkUserAndRedirect() async {
     final userController = Provider.of<UserController>(context, listen: false);
+    final user = userController.user;
 
-    await userController.getUserLocation();
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null && mounted) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const OnboardingPage()));
+    if (user == null) {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const OnboardingPage()),
+      );
       return;
     }
 
     final userProfile = await userController.loadUserProfile();
 
-    if (userProfile != null && mounted) {
+    // Check if user is in company view
+    if (userController.isCompanyView) {
+      await userController.loadCompanyProfile();
+      if (!mounted) return;
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomePage()));
+        context,
+        MaterialPageRoute(builder: (context) => const CompanyHomePage()),
+      );
       return;
     }
 
-    await userController.loadCompanyProfile();
-
-    if (mounted) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const CompanyHomePage()));
+    if (userProfile != null && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
     }
   }
 
