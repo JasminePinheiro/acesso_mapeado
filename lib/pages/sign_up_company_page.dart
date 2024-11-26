@@ -28,8 +28,6 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
   final _phoneController = MaskedTextController(mask: '(00) 00000-0000');
   final _addressController = TextEditingController();
   final _aboutController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
   final _cepController = MaskedTextController(mask: '00000-000');
   final _numberController = TextEditingController();
   final _neighborhoodController = TextEditingController();
@@ -113,8 +111,6 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
       stateController: _stateController,
       zipCodeController: _cepController,
       aboutController: _aboutController,
-      passwordController: _passwordController,
-      confirmPasswordController: _confirmPasswordController,
       workingHoursController: _workingHoursController,
       instagramUrlController: _instagramUrlController,
       facebookUrlController: _facebookUrlController,
@@ -135,8 +131,6 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
     _phoneController.dispose();
     _addressController.dispose();
     _aboutController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     _cepController.dispose();
     _numberController.dispose();
     _neighborhoodController.dispose();
@@ -523,51 +517,6 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
             return null;
           },
         ),
-        const SizedBox(height: 20),
-        TextFormField(
-          controller: _passwordController,
-          decoration: const InputDecoration(
-            labelText: 'Senha',
-            border: OutlineInputBorder(),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          ),
-          obscureText: true,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor, insira a senha';
-            }
-            if (!_controller.isValidPassword(value)) {
-              return 'A senha deve conter no mínimo 8 caracteres, incluindo: '
-                  '\n- Uma letra maiúscula'
-                  '\n- Uma letra minúscula'
-                  '\n- Um número'
-                  '\n- Um caractere especial';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 20),
-        TextFormField(
-          controller: _confirmPasswordController,
-          decoration: const InputDecoration(
-            labelText: 'Confirmar senha',
-            border: OutlineInputBorder(),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          ),
-          obscureText: true,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor, confirme a senha';
-            }
-            if (value != _passwordController.text) {
-              return 'As senhas não correspondem';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 20),
         _buildWorkingHours(),
       ],
     );
