@@ -37,5 +37,6 @@ O repositório serve como demonstração de habilidades e um exemplo de soluçã
 
 - Jasmine Pinheiro de Souza
 - Lucas Barbosa Calixto
-  Orientador: Prof. Me. Antônio Angelo de Souza Tartaglia
+  
+Orientador: Prof. Me. Antônio Angelo de Souza Tartaglia
 
