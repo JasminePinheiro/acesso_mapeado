@@ -5,6 +5,7 @@ import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
+import 'package:acesso_mapeado/widgets/color_blind_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +32,20 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
   late MaskedTextController _cnpjController;
   late MaskedTextController _phoneController;
   late TextEditingController _addressController;
+  late TextEditingController _numberController;
+  late TextEditingController _neighborhoodController;
+  late TextEditingController _cityController;
+  late TextEditingController _stateController;
   late TextEditingController _aboutController;
   late MaskedTextController _cepController;
-  late TextEditingController _passwordController;
-  late TextEditingController _confirmPasswordController;
+  late TextEditingController _instagramUrlController;
+  late TextEditingController _facebookUrlController;
+  late TextEditingController _twitterUrlController;
+  late TextEditingController _youtubeUrlController;
+  late TextEditingController _tiktokUrlController;
+  late TextEditingController _pinterestUrlController;
+  late TextEditingController _linkedinUrlController;
+  late TextEditingController _websiteUrlController;
 
   // Controladores de tempo para cada dia da semana
   final Map<String, TextEditingController> _openingTimeControllers = {
@@ -57,12 +68,6 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     'Domingo': TextEditingController(),
   };
 
-  // Controladores locais para campos adicionais
-  late TextEditingController _numberController;
-  late TextEditingController _neighborhoodController;
-  late TextEditingController _cityController;
-  late TextEditingController _stateController;
-
   bool _isLoading = false;
   String? _imageBase64;
   File? _imageFile;
@@ -75,7 +80,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
       {"tipo": "Elevadores", "status": false},
       {"tipo": "Portas Largas", "status": false},
       {"tipo": "Banheiros Adaptados", "status": false},
-      {"tipo": "Pisos e Superfícies Anti-derrapantes", "status": false},
+      {"tipo": "Pisos Táteis e Superfícies Anti-derrapantes", "status": false},
       {"tipo": "Estacionamento Reservado", "status": false}
     ],
     "Acessibilidade Comunicacional": [
@@ -94,12 +99,13 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     ],
   };
 
-  // Flag para rastrear a validade do CEP
-  bool _isCEPValid = false;
-
   @override
   void initState() {
+    initializeControllers();
     super.initState();
+  }
+
+  void initializeControllers() {
     // Inicialização dos controladores com os dados existentes da empresa
     _nameController = TextEditingController(text: widget.company.name);
     _emailController = TextEditingController(text: widget.company.email);
@@ -108,18 +114,37 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     _phoneController = MaskedTextController(
         mask: '(00) 00000-0000', text: widget.company.phoneNumber);
     _addressController = TextEditingController(text: widget.company.address);
+
     _aboutController = TextEditingController(text: widget.company.about);
+
     _cepController =
-        MaskedTextController(mask: '00000-000', text: ''); // Inicializado vazio
-    _passwordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
+        MaskedTextController(mask: '00000-000', text: widget.company.zipCode);
+
     _imageBase64 = widget.company.imageUrl;
 
     // Inicialização dos controladores locais para campos adicionais
-    _numberController = TextEditingController();
-    _neighborhoodController = TextEditingController();
-    _cityController = TextEditingController();
-    _stateController = TextEditingController();
+    _numberController = TextEditingController(text: widget.company.number);
+    _neighborhoodController =
+        TextEditingController(text: widget.company.neighborhood);
+    _cityController = TextEditingController(text: widget.company.city);
+    _stateController = TextEditingController(text: widget.company.state);
+
+    _instagramUrlController =
+        TextEditingController(text: widget.company.instagramUrl);
+    _facebookUrlController =
+        TextEditingController(text: widget.company.facebookUrl);
+    _twitterUrlController =
+        TextEditingController(text: widget.company.twitterUrl);
+    _youtubeUrlController =
+        TextEditingController(text: widget.company.youtubeUrl);
+    _tiktokUrlController =
+        TextEditingController(text: widget.company.tiktokUrl);
+    _pinterestUrlController =
+        TextEditingController(text: widget.company.pinterestUrl);
+    _linkedinUrlController =
+        TextEditingController(text: widget.company.linkedinUrl);
+    _websiteUrlController =
+        TextEditingController(text: widget.company.websiteUrl);
 
     // Inicialização dos horários de funcionamento, se disponíveis
     if (widget.company.workingHours != null) {
@@ -149,8 +174,6 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
         }
       }
     }
-
-    // (Opcional) Você pode inicializar os controladores locais com dados existentes armazenados separadamente no Firestore, se aplicável.
   }
 
   @override
@@ -163,8 +186,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     _addressController.dispose();
     _aboutController.dispose();
     _cepController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+
     for (var controller in _openingTimeControllers.values) {
       controller.dispose();
     }
@@ -215,9 +237,9 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
               ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.grey[200],
-                  child: const Icon(
+                  child: Icon(
                     Icons.photo_library,
-                    color: AppColors.veryLightPurple,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 title: Text(
@@ -232,9 +254,9 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
               ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.grey[200],
-                  child: const Icon(
+                  child: Icon(
                     Icons.camera_alt,
-                    color: AppColors.darkGray,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 title: Text(
@@ -338,7 +360,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
         CircleAvatar(
           radius: 15,
           backgroundColor: _currentStep == stepIndex
-              ? AppColors.lightPurple
+              ? Theme.of(context).colorScheme.primary
               : AppColors.lightGray.withOpacity(0.3),
           child: Text(
             (stepIndex + 1).toString(),
@@ -479,51 +501,88 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
           },
         ),
         const SizedBox(height: 20),
-        // Campo para redefinir senha, opcional
-        TextFormField(
-          controller: _passwordController,
-          decoration: const InputDecoration(
-            labelText: 'Nova Senha (opcional)',
-            border: OutlineInputBorder(),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          ),
-          obscureText: true,
-          validator: (value) {
-            if (value != null && value.isNotEmpty && !_isValidPassword(value)) {
-              return 'A senha deve conter no mínimo 8 caracteres, incluindo: '
-                  '\n- Uma letra maiúscula'
-                  '\n- Uma letra minúscula'
-                  '\n- Um número'
-                  '\n- Um caractere especial';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 20),
-        TextFormField(
-          controller: _confirmPasswordController,
-          decoration: const InputDecoration(
-            labelText: 'Confirmar Nova Senha',
-            border: OutlineInputBorder(),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          ),
-          obscureText: true,
-          validator: (value) {
-            if (_passwordController.text.isNotEmpty) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor, confirme a senha';
-              }
-              if (value != _passwordController.text) {
-                return 'As senhas não correspondem';
-              }
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 20),
         _buildWorkingHours(),
+        const SizedBox(height: 20),
+        TextFormField(
+          controller: _instagramUrlController,
+          decoration: const InputDecoration(
+            labelText: 'Instagram (URL)',
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          ),
+        ),
+        const SizedBox(height: 20),
+        TextFormField(
+          controller: _facebookUrlController,
+          decoration: const InputDecoration(
+            labelText: 'Facebook (URL)',
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          ),
+        ),
+        const SizedBox(height: 20),
+        TextFormField(
+          controller: _twitterUrlController,
+          decoration: const InputDecoration(
+            labelText: 'Twitter (URL)',
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          ),
+        ),
+        const SizedBox(height: 20),
+        TextFormField(
+          controller: _youtubeUrlController,
+          decoration: const InputDecoration(
+            labelText: 'YouTube (URL)',
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          ),
+        ),
+        const SizedBox(height: 20),
+        TextFormField(
+          controller: _tiktokUrlController,
+          decoration: const InputDecoration(
+            labelText: 'TikTok (URL)',
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          ),
+        ),
+        const SizedBox(height: 20),
+        TextFormField(
+          controller: _pinterestUrlController,
+          decoration: const InputDecoration(
+            labelText: 'Pinterest (URL)',
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          ),
+        ),
+        const SizedBox(height: 20),
+        TextFormField(
+          controller: _linkedinUrlController,
+          decoration: const InputDecoration(
+            labelText: 'LinkedIn (URL)',
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          ),
+        ),
+        const SizedBox(height: 20),
+        TextFormField(
+          controller: _websiteUrlController,
+          decoration: const InputDecoration(
+            labelText: 'Website (URL)',
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          ),
+        ),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -633,16 +692,16 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
             onPressed: _clearWorkingHours,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.white,
-              side: const BorderSide(
-                color: AppColors.lightPurple,
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
                 width: 2,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
+            child: Text(
               'Limpar Horários',
               style: TextStyle(
-                color: AppColors.lightPurple,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: AppTypography.small,
               ),
@@ -666,6 +725,10 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     }
   }
 
+  bool _isValidCEP(String cep) {
+    return cep.length == 9 && cep.replaceAll('-', '').isNotEmpty;
+  }
+
   // Método para construir o passo de Endereço
   Widget _buildStepAddress() {
     return Column(
@@ -684,7 +747,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
             if (value == null || value.isEmpty) {
               return 'Por favor, insira o CEP';
             }
-            if (!_isCEPValid) {
+            if (!_isValidCEP(value)) {
               return 'CEP inválido';
             }
             return null;
@@ -697,18 +760,11 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                     await getAddressData(value.replaceAll('-', ''));
                 if (addressData.containsKey('erro') &&
                     addressData['erro'] == true) {
-                  setState(() {
-                    _isCEPValid = false;
-                  });
-
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('CEP não encontrado')),
-                    );
-                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('CEP não encontrado')),
+                  );
                 } else {
                   setState(() {
-                    _isCEPValid = true;
                     _addressController.text = addressData['logradouro'] ?? '';
                     _neighborhoodController.text = addressData['bairro'] ?? '';
                     _cityController.text = addressData['localidade'] ?? '';
@@ -716,21 +772,12 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                   });
                 }
               } catch (e) {
-                setState(() {
-                  _isCEPValid = false;
-                });
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text(
-                            'Erro ao buscar o endereço. Verifique o CEP.')),
-                  );
-                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content:
+                          Text('Erro ao buscar o endereço. Verifique o CEP.')),
+                );
               }
-            } else {
-              setState(() {
-                _isCEPValid = false;
-              });
             }
           },
         ),
@@ -855,7 +902,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                     item["status"] = value ?? false;
                   });
                 },
-                activeColor: AppColors.lightPurple,
+                activeColor: Theme.of(context).colorScheme.primary,
                 checkColor: AppColors.white,
               );
             }).toList(),
@@ -866,19 +913,19 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
   }
 
   // Método para obter os dados de horários de funcionamento
-  Map<String, Map<String, String>> _getWorkingHoursData() {
-    Map<String, Map<String, String>> data = {};
+  List<Map<String, String>> _getWorkingHoursData() {
+    List<Map<String, String>> data = [];
     for (String day in _openingTimeControllers.keys) {
       String open = _openingTimeControllers[day]!.text;
       String close = _closingTimeControllers[day]!.text;
 
-      if (open.isNotEmpty || close.isNotEmpty) {
-        data[day] = {
-          'open': open.isNotEmpty ? open : 'Fechado',
-          'close': close.isNotEmpty ? close : 'Fechado',
-        };
-      }
+      data.add({
+        'day': day,
+        'open': open.isNotEmpty ? open : 'Fechado',
+        'close': close.isNotEmpty ? close : 'Fechado',
+      });
     }
+
     return data;
   }
 
@@ -890,14 +937,6 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     if (cnpjDigits.length != 14) return false;
     // Adicione validações adicionais se necessário
     return true;
-  }
-
-  // Método para validar senha
-  bool _isValidPassword(String password) {
-    // Validação: mínimo 8 caracteres, pelo menos uma maiúscula, uma minúscula, um número e um caractere especial
-    final regex = RegExp(
-        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
-    return regex.hasMatch(password);
   }
 
   // Método para salvar as alterações
@@ -947,22 +986,21 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
         'accessibilityData': updatedAccessibilityData,
         'workingHours': workingHoursData,
         'imageUrl': _imageBase64,
+        'instagramUrl': _instagramUrlController.text,
+        'facebookUrl': _facebookUrlController.text,
+        'twitterUrl': _twitterUrlController.text,
+        'youtubeUrl': _youtubeUrlController.text,
+        'tiktokUrl': _tiktokUrlController.text,
+        'pinterestUrl': _pinterestUrlController.text,
+        'linkedinUrl': _linkedinUrlController.text,
+        'websiteUrl': _websiteUrlController.text,
         ...additionalData, // Inclua os dados adicionais
       };
-
-      // Se a senha for atualizada
-      if (_passwordController.text.isNotEmpty) {
-        updateData['password'] = _passwordController.text;
-      }
 
       await FirebaseFirestore.instance
           .collection('companies')
           .doc(user.uid)
           .update(updateData);
-
-      if (_passwordController.text.isNotEmpty) {
-        await user.updatePassword(_passwordController.text);
-      }
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1036,7 +1074,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Perfil'),
-        backgroundColor: AppColors.lightPurple,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: AppColors.white,
       ),
       body: SingleChildScrollView(
@@ -1055,16 +1093,20 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                 child: SizedBox(
                   child: Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage: _imageFile != null
-                            ? FileImage(_imageFile!)
-                            : (_imageBase64 != null
-                                    ? MemoryImage(base64Decode(
-                                        _imageBase64!.split(',').last))
-                                    : const AssetImage(
-                                        'assets/images/img-company.png'))
-                                as ImageProvider,
+                      ClipOval(
+                        child: ColorBlindImage(
+                          imageProvider: _imageFile != null
+                              ? FileImage(_imageFile!)
+                              : (_imageBase64 != null
+                                      ? MemoryImage(base64Decode(
+                                          _imageBase64!.split(',').last))
+                                      : const AssetImage(
+                                          'assets/images/img-company.png'))
+                                  as ImageProvider,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Positioned(
                         bottom: 0,
@@ -1072,14 +1114,14 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                         child: Container(
                           height: 40,
                           width: 40,
-                          decoration: const BoxDecoration(
-                              color: AppColors.veryLightPurple,
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle),
                           child: IconButton(
                             onPressed: _showImageOptionsBottomSheet,
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.camera_alt,
-                              color: AppColors.lightPurple,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               size: 23,
                             ),
                           ),
@@ -1104,9 +1146,10 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                       onPressed: _onStepCancel,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        side: const BorderSide(
-                            color: AppColors.lightPurple, width: 2),
-                        foregroundColor: AppColors.lightPurple,
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2),
+                        foregroundColor: Theme.of(context).colorScheme.primary,
                       ),
                       child: const Text('Voltar',
                           style: TextStyle(
@@ -1116,7 +1159,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                   ElevatedButton(
                     onPressed: _isLoading ? null : _onStepContinue,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.lightPurple),
+                        backgroundColor: Theme.of(context).colorScheme.primary),
                     child: _isLoading
                         ? const CircularProgressIndicator(
                             color: AppColors.white)

@@ -2,12 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/pages/support_page.dart';
+import 'package:acesso_mapeado/shared/color_blindness_type.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
+import 'package:acesso_mapeado/widgets/color_blind_image.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:color_blindness/color_blindness.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_settings_plus/core/open_settings_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:intl/intl.dart';
@@ -26,10 +31,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   late MaskedTextController _dateOfBirthController;
   late MaskedTextController cpfController;
   late TextEditingController emailController;
-  final UserController _authService = UserController(
-    auth: FirebaseAuth.instance,
-    firestore: FirebaseFirestore.instance,
-  );
+
+  late UserController _userController;
 
   bool _isLoading = false;
   int _currentStep = 0; // Variável para controlar o passo atual
@@ -41,7 +44,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       {"tipo": "Elevadores", "status": false},
       {"tipo": "Portas Largas", "status": false},
       {"tipo": "Banheiros Adaptados", "status": false},
-      {"tipo": "Pisos e Superfícies Anti-derrapantes", "status": false},
+      {"tipo": "Pisos Táteis e Superfícies Anti-derrapantes", "status": false},
       {"tipo": "Estacionamento Reservado", "status": false}
     ],
     "Acessibilidade Comunicacional": [
@@ -63,8 +66,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   @override
   void initState() {
     super.initState();
-    final userController = Provider.of<UserController>(context, listen: false);
-    final user = userController.userModel;
+    _userController = Provider.of<UserController>(context, listen: false);
+    final user = _userController.userModel;
 
     _nameController = TextEditingController(text: user?.name ?? '');
     _dateOfBirthController = MaskedTextController(
@@ -215,9 +218,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const CircleAvatar(
-                  child:
-                      Icon(Icons.photo_library, color: AppColors.lightPurple),
+                leading: CircleAvatar(
+                  backgroundColor: AppColors.darkGray,
+                  child: Icon(Icons.photo_library,
+                      color: Theme.of(context).colorScheme.primary),
                 ),
                 title: Text(
                   'Galeria',
@@ -229,8 +233,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 },
               ),
               ListTile(
-                leading: const CircleAvatar(
-                  child: Icon(Icons.camera_alt, color: AppColors.lightPurple),
+                leading: CircleAvatar(
+                  backgroundColor: AppColors.darkGray,
+                  child: Icon(Icons.camera_alt,
+                      color: Theme.of(context).colorScheme.primary),
                 ),
                 title: Text(
                   'Câmera',
@@ -242,8 +248,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 },
               ),
               ListTile(
-                leading: const CircleAvatar(
-                  child: Icon(Icons.delete, color: AppColors.lightPurple),
+                leading: CircleAvatar(
+                  backgroundColor: AppColors.darkGray,
+                  child: Icon(Icons.delete,
+                      color: Theme.of(context).colorScheme.primary),
                 ),
                 title: Text(
                   'Remover',
@@ -317,7 +325,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 try {
-                  await _authService.resetPassword(email);
+                  await _userController.resetPassword(email);
                   _showSuccessDialog(
                       'E-mail de redefinição de senha enviado com sucesso!');
                 } on FirebaseAuthException catch (e) {
@@ -327,9 +335,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   _showErrorDialog('Erro desconhecido: ${e.toString()}');
                 }
               },
-              child: const Text(
+              child: Text(
                 'Confirmar',
-                style: TextStyle(color: AppColors.lightPurple),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
           ],
@@ -369,11 +379,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text(
+              child: Text(
                 'OK',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.lightPurple,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -414,11 +424,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text(
+              child: Text(
                 'OK',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.lightPurple,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -451,10 +461,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text(
+              child: Text(
                 'Cancelar',
                 style: TextStyle(
-                  color: AppColors.lightPurple,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -469,10 +479,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   (Route<dynamic> route) => false,
                 );
               },
-              child: const Text(
+              child: Text(
                 'Sair',
                 style: TextStyle(
-                  color: Colors.red,
+                  color: Theme.of(context).colorScheme.error,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -495,64 +505,77 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     bool readOnly = false,
     FormFieldValidator<String>? validator,
   }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+    return Semantics(
+      textField: true,
+      label: label,
+      hint: readOnly ? 'Campo somente leitura' : 'Campo editável',
+      value: controller.text,
+      enabled: !readOnly,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        ),
+        keyboardType: keyboardType,
+        obscureText: isPassword,
+        readOnly: readOnly,
+        onTap: readOnly
+            ? () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        'Para alterar o $label, entre em contato com o suporte.'),
+                  ),
+                );
+              }
+            : null,
+        validator: validator ??
+            (value) {
+              if (value == null || value.isEmpty) {
+                return validationMessage;
+              }
+              if (isDateOfBirth && !isValidDateOfBirth(value)) {
+                return 'Insira uma data de nascimento válida';
+              }
+              return null;
+            },
       ),
-      keyboardType: keyboardType,
-      obscureText: isPassword,
-      readOnly: readOnly,
-      onTap: readOnly
-          ? () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                      'Para alterar o $label, entre em contato com o suporte.'),
-                ),
-              );
-            }
-          : null,
-      validator: validator ??
-          (value) {
-            if (value == null || value.isEmpty) {
-              return validationMessage;
-            }
-            if (isDateOfBirth && !isValidDateOfBirth(value)) {
-              return 'Insira uma data de nascimento válida';
-            }
-            return null;
-          },
     );
   }
 
   // Indicadores de passo
   Widget _buildStepIndicator(int stepIndex, String stepName) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 15,
-          backgroundColor: _currentStep == stepIndex
-              ? AppColors.lightPurple
-              : AppColors.lightGray.withOpacity(0.3),
-          child: Text(
-            (stepIndex + 1).toString(),
-            style: TextStyle(
-              color:
-                  _currentStep == stepIndex ? AppColors.white : AppColors.black,
-              fontSize: 14,
+    return Semantics(
+      label: 'Passo ${stepIndex + 1}: $stepName',
+      value:
+          _currentStep == stepIndex ? 'Passo atual' : 'Passo não selecionado',
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 15,
+            backgroundColor: _currentStep == stepIndex
+                ? Theme.of(context).colorScheme.primary
+                : AppColors.lightGray.withOpacity(0.3),
+            child: Text(
+              (stepIndex + 1).toString(),
+              style: TextStyle(
+                color: _currentStep == stepIndex
+                    ? AppColors.white
+                    : AppColors.black,
+                fontSize: 14,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          stepName,
-          style: const TextStyle(fontSize: 13, color: AppColors.black),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            stepName,
+            style: const TextStyle(fontSize: 13, color: AppColors.black),
+          ),
+        ],
+      ),
     );
   }
 
@@ -576,7 +599,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         const SizedBox(height: 20),
         _buildTextField(
           _dateOfBirthController,
-          'Data de nascimento (dd/MM/yyyy)',
+          'Data de nascimento',
           TextInputType.datetime,
           'Por favor, insira uma data de nascimento válida',
           isDateOfBirth: true,
@@ -606,45 +629,139 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   Widget _buildAccessibilityStep() {
     return Column(
       children: [
-        const Center(
-          child: Text(
-            textAlign: TextAlign.center,
-            "Marque as acessibilidades que deseja encontrar nos estabelecimentos",
-            style: TextStyle(
-                color: AppColors.black, fontSize: AppTypography.large),
+        Semantics(
+          header: true,
+          child: const Center(
+            child: Text(
+              textAlign: TextAlign.center,
+              "Marque as acessibilidades que deseja encontrar nos estabelecimentos",
+              style: TextStyle(
+                  color: AppColors.black, fontSize: AppTypography.large),
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.large),
         ...accessibilityData.entries.map((entry) {
           String category = entry.key;
           List<Map<String, dynamic>> items = entry.value;
-          return ExpansionTile(
-            title: Text(
-              category,
-              style: const TextStyle(
-                  color: AppColors.black,
-                  fontSize: AppSpacing.medium,
-                  fontWeight: FontWeight.bold),
+          return Semantics(
+            button: true,
+            label: 'Categoria: $category',
+            child: ExpansionTile(
+              title: Text(
+                category,
+                style: const TextStyle(
+                    color: AppColors.black,
+                    fontSize: AppSpacing.medium,
+                    fontWeight: FontWeight.bold),
+              ),
+              children: items.map((item) {
+                return Semantics(
+                  checked: item["status"],
+                  label: item["tipo"],
+                  child: CheckboxListTile(
+                    title: Text(
+                      item["tipo"],
+                      style: const TextStyle(color: AppColors.darkGray),
+                    ),
+                    value: item["status"],
+                    onChanged: (bool? value) {
+                      setState(() {
+                        item["status"] = value ?? false;
+                      });
+                    },
+                    activeColor: Theme.of(context).colorScheme.primary,
+                  ),
+                );
+              }).toList(),
             ),
-            children: items.map((item) {
-              return CheckboxListTile(
-                title: Text(
-                  item["tipo"],
-                  style: const TextStyle(color: AppColors.darkGray),
-                ),
-                value: item["status"],
-                onChanged: (bool? value) {
-                  setState(() {
-                    item["status"] = value ?? false;
-                  });
-                },
-                activeColor: AppColors.lightPurple,
-                checkColor: AppColors.white,
-              );
-            }).toList(),
           );
         }),
       ],
+    );
+  }
+
+  void _updateColorBlindnessType(ColorBlindnessType type) async {
+    final providerColorBlindness =
+        Provider.of<ProviderColorBlindnessType>(context, listen: false);
+
+    providerColorBlindness.setCurrentType(type);
+    await providerColorBlindness.saveCurrentTypeToSharedPreferences();
+
+    // Update UI
+    setState(() {});
+  }
+
+  Widget _buildColorBlindnessSection() {
+    final providerColorBlindness =
+        Provider.of<ProviderColorBlindnessType>(context, listen: false);
+    return Semantics(
+      label: 'Seção de configuração de daltonismo',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: ExpansionTile(
+              title: Semantics(
+                header: true,
+                child: Text(
+                  'Selecione o tipo de daltonismo',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              children: ColorBlindnessType.values.map((type) {
+                return Semantics(
+                  label: providerColorBlindness.getTranslation(type),
+                  selected: type == providerColorBlindness.getCurrentType(),
+                  child: RadioListTile<ColorBlindnessType>(
+                    title: Text(
+                      providerColorBlindness.getTranslation(type),
+                      style: const TextStyle(color: AppColors.black),
+                    ),
+                    value: type,
+                    groupValue: Provider.of<ProviderColorBlindnessType>(context)
+                        .getCurrentType(),
+                    onChanged: (ColorBlindnessType? value) {
+                      if (value != null) {
+                        _updateColorBlindnessType(value);
+                      }
+                    },
+                    activeColor: Theme.of(context).colorScheme.primary,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Melhorar a acessibilidade dos botões de ação
+  Widget _buildActionButton(
+      IconData icon, String label, VoidCallback onPressed) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: Row(
+        children: [
+          Icon(icon, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          TextButton(
+            onPressed: onPressed,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.black,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -678,13 +795,17 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 child: SizedBox(
                   child: Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage: imageUrl != null
-                            ? MemoryImage(base64Decode(imageUrl))
-                            : const AssetImage(
-                                    'assets/images/placeholder-user.png')
-                                as ImageProvider,
+                      ClipOval(
+                        child: ColorBlindImage(
+                          imageProvider: imageUrl != null
+                              ? MemoryImage(base64Decode(imageUrl))
+                              : const AssetImage(
+                                      'assets/images/placeholder-user.png')
+                                  as ImageProvider,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Positioned(
                         bottom: 0,
@@ -692,14 +813,14 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                         child: Container(
                           height: 40,
                           width: 40,
-                          decoration: const BoxDecoration(
-                              color: AppColors.veryLightPurple,
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle),
                           child: IconButton(
                             onPressed: _showOpcoesBottomSheet,
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.camera_alt,
-                              color: AppColors.lightPurple,
+                              color: Theme.of(context).colorScheme.onSecondary,
                               size: 23,
                             ),
                           ),
@@ -710,6 +831,25 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 ),
               ),
               const SizedBox(height: 45),
+              _buildColorBlindnessSection(),
+              const SizedBox(height: 20),
+
+              ElevatedButton(
+                onPressed: () {
+                  switch (OpenSettingsPlus.shared) {
+                    case OpenSettingsPlusAndroid settings:
+                      settings.accessibility();
+                      break;
+                    case OpenSettingsPlusIOS settings:
+                      settings.accessibility();
+                      break;
+                    default:
+                      break;
+                  }
+                },
+                child: const Text('Abrir configurações de Acessibilidade'),
+              ),
+              const SizedBox(height: 20),
               // Passos do formulário
               if (_currentStep == 0) _buildPersonalInfoStep(),
               if (_currentStep == 1) _buildAccessibilityStep(),
@@ -723,9 +863,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                       onPressed: _onStepCancel,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        side: const BorderSide(
-                            color: AppColors.lightPurple, width: 2),
-                        foregroundColor: AppColors.lightPurple,
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2),
+                        foregroundColor: Theme.of(context).colorScheme.primary,
                       ),
                       child: const Text('Voltar',
                           style: TextStyle(
@@ -735,100 +876,41 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   ElevatedButton(
                     onPressed: _isLoading ? null : _onStepContinue,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.lightPurple),
+                        backgroundColor: Theme.of(context).colorScheme.primary),
                     child: _isLoading
                         ? const CircularProgressIndicator(
                             color: AppColors.white)
                         : Text(
                             _currentStep == 1 ? 'Salvar Alterações' : 'Próximo',
                             style: const TextStyle(
-                                color: AppColors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16),
+                                fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                   ),
                 ],
               ),
               const SizedBox(height: 45),
-              Row(
-                children: [
-                  const Icon(Icons.contact_support_outlined,
-                      color: AppColors.lightPurple),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SupportPage()));
-                    },
-                    child: const Text(
-                      'Suporte',
-                      style: TextStyle(
-                          color: AppColors.black,
-                          fontWeight: FontWeight.normal),
-                    ),
+              _buildActionButton(Icons.contact_support_outlined, 'Suporte', () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SupportPage()));
+              }),
+              _buildActionButton(Icons.lock_clock_outlined, 'Redefinir senha',
+                  () {
+                _resetPassword();
+              }),
+              _buildActionButton(Icons.delete_outline, 'Excluir conta', () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                        'Para excluir a conta, entre em contato com o suporte.'),
                   ),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.lock_clock_outlined,
-                      color: AppColors.lightPurple),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: _resetPassword,
-                    child: const Text(
-                      'Redefinir senha',
-                      style: TextStyle(
-                          color: AppColors.black,
-                          fontWeight: FontWeight.normal),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.delete_outline,
-                      color: AppColors.lightPurple),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                              'Para excluir a conta, entre em contato com o suporte.'),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Excluir conta',
-                      style: TextStyle(
-                          color: AppColors.black,
-                          fontWeight: FontWeight.normal),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.exit_to_app, color: AppColors.lightPurple),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      Provider.of<UserController>(context, listen: false);
-                      _showLogoutConfirmationDialog();
-                    },
-                    child: const Text(
-                      'Sair',
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                );
+              }),
+              _buildActionButton(Icons.exit_to_app, 'Sair', () {
+                Provider.of<UserController>(context, listen: false);
+                _showLogoutConfirmationDialog();
+              }),
             ],
           ),
         ),

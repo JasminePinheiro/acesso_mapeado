@@ -5,11 +5,14 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i7;
 import 'dart:typed_data' as _i9;
+import 'dart:ui' as _i13;
 
 import 'package:acesso_mapeado/models/user_model.dart' as _i10;
+import 'package:acesso_mapeado/shared/color_blindness_type.dart' as _i11;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i6;
 import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart'
     as _i5;
+import 'package:color_blindness/color_blindness.dart' as _i12;
 import 'package:firebase_auth/firebase_auth.dart' as _i4;
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart'
     as _i3;
@@ -2314,4 +2317,127 @@ class MockUserModel extends _i1.Mock implements _i10.UserModel {
         ),
         returnValue: <String, dynamic>{},
       ) as Map<String, dynamic>);
+}
+
+/// A class which mocks [ProviderColorBlindnessType].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockProviderColorBlindnessType extends _i1.Mock
+    implements _i11.ProviderColorBlindnessType {
+  MockProviderColorBlindnessType() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  bool get hasListeners => (super.noSuchMethod(
+        Invocation.getter(#hasListeners),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  void setCurrentType(_i12.ColorBlindnessType? type) => super.noSuchMethod(
+        Invocation.method(
+          #setCurrentType,
+          [type],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i7.Future<void> setCurrentTypeFromSharedPreferences() => (super.noSuchMethod(
+        Invocation.method(
+          #setCurrentTypeFromSharedPreferences,
+          [],
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
+
+  @override
+  _i7.Future<void> saveCurrentTypeToSharedPreferences() => (super.noSuchMethod(
+        Invocation.method(
+          #saveCurrentTypeToSharedPreferences,
+          [],
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
+
+  @override
+  void clearCurrentType() => super.noSuchMethod(
+        Invocation.method(
+          #clearCurrentType,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i12.ColorBlindnessType getCurrentType() => (super.noSuchMethod(
+        Invocation.method(
+          #getCurrentType,
+          [],
+        ),
+        returnValue: _i12.ColorBlindnessType.none,
+      ) as _i12.ColorBlindnessType);
+
+  @override
+  _i7.Future<bool> isFirstTime() => (super.noSuchMethod(
+        Invocation.method(
+          #isFirstTime,
+          [],
+        ),
+        returnValue: _i7.Future<bool>.value(false),
+      ) as _i7.Future<bool>);
+
+  @override
+  String getTranslation(_i12.ColorBlindnessType? type) => (super.noSuchMethod(
+        Invocation.method(
+          #getTranslation,
+          [type],
+        ),
+        returnValue: _i8.dummyValue<String>(
+          this,
+          Invocation.method(
+            #getTranslation,
+            [type],
+          ),
+        ),
+      ) as String);
+
+  @override
+  void addListener(_i13.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #addListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeListener(_i13.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #removeListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+        Invocation.method(
+          #notifyListeners,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
 }

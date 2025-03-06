@@ -3,17 +3,26 @@ import 'dart:io';
 
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/models/user_model.dart';
+import 'package:acesso_mapeado/shared/color_blindness_type.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
+
+import 'package:color_blindness/color_blindness.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserController with ChangeNotifier {
+  late final FirebaseAuth auth;
+  late final FirebaseFirestore firestore;
+
   UserController({
     required this.auth,
     required this.firestore,
+    required this.providerColorBlindnessType,
   }) {
     _user = auth.currentUser;
     auth.authStateChanges().listen((user) {
@@ -21,9 +30,7 @@ class UserController with ChangeNotifier {
       notifyListeners();
     });
   }
-
-  late final FirebaseAuth auth;
-  late final FirebaseFirestore firestore;
+  final ProviderColorBlindnessType providerColorBlindnessType;
 
   User? _user;
   UserModel? _userModel;
@@ -39,6 +46,14 @@ class UserController with ChangeNotifier {
   void setUserPosition(LatLng position) {
     _userPosition = position;
     notifyListeners();
+  }
+
+  void setColorBlindnessTypeFromRemoteConfig() {
+    loadUserProfile().then((userModel) {
+      providerColorBlindnessType.setCurrentType(
+          userModel?.colorBlindnessType ?? ColorBlindnessType.none);
+      notifyListeners();
+    });
   }
 
   void setUser(User user) {

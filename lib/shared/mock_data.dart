@@ -11,7 +11,7 @@ final Map<String, dynamic> companyData = {
       {"tipo": "Elevadores", "status": true},
       {"tipo": "Portas Largas", "status": true},
       {"tipo": "Banheiros Adaptados", "status": false},
-      {"tipo": "Pisos e Superfícies Anti-derrapantes", "status": true},
+      {"tipo": "Pisos Táteis e Superfícies Anti-derrapantes", "status": true},
       {"tipo": "Estacionamento Reservado", "status": true}
     ],
     "Acessibilidade Comunicacional": [
@@ -68,7 +68,7 @@ final Map<String, List<Map<String, dynamic>>> accessibilityData = {
     {"tipo": "Elevadores", "status": false},
     {"tipo": "Portas Largas", "status": false},
     {"tipo": "Banheiros Adaptados", "status": false},
-    {"tipo": "Pisos e Superfícies Anti-derrapantes", "status": false},
+    {"tipo": "Pisos Táteis e Superfícies Anti-derrapantes", "status": false},
     {"tipo": "Estacionamento Reservado", "status": false}
   ],
   "Acessibilidade Comunicacional": [

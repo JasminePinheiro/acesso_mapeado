@@ -171,12 +171,6 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (_currentStep > 0)
                           ElevatedButton(
                             onPressed: _onStepCancel,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              side: const BorderSide(
-                                  color: AppColors.lightPurple, width: 2),
-                              foregroundColor: AppColors.lightPurple,
-                            ),
                             child: const Text('Voltar',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 16)),
@@ -185,27 +179,19 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (_currentStep == 2)
                           ElevatedButton(
                             onPressed: _onFinish,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.lightPurple),
                             child: const Text(
                               'Cadastrar',
                               style: TextStyle(
-                                  color: AppColors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18),
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           )
                         else
                           ElevatedButton(
                             onPressed: _onStepContinue,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.lightPurple),
                             child: const Text(
                               'Próximo',
                               style: TextStyle(
-                                  color: AppColors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18),
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           ),
                       ],
@@ -226,8 +212,11 @@ class _SignUpPageState extends State<SignUpPage> {
         CircleAvatar(
           radius: 15,
           backgroundColor: _currentStep == stepIndex
-              ? AppColors.lightPurple
-              : AppColors.lightGray.withOpacity(0.3),
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withOpacity(0.15),
           child: Text(
             (stepIndex + 1).toString(),
             style: TextStyle(
@@ -359,8 +348,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     item["status"] = value ?? false;
                   });
                 },
-                activeColor: AppColors.lightPurple,
-                checkColor: AppColors.white,
+                activeColor: Theme.of(context).colorScheme.primary,
+                checkColor: Theme.of(context).colorScheme.onPrimary,
               );
             }).toList(),
           );

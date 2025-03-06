@@ -36,6 +36,14 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
   final _cityController = TextEditingController();
   final _stateController = TextEditingController();
   final _workingHoursController = TextEditingController();
+  final _instagramUrlController = TextEditingController();
+  final _facebookUrlController = TextEditingController();
+  final _twitterUrlController = TextEditingController();
+  final _youtubeUrlController = TextEditingController();
+  final _tiktokUrlController = TextEditingController();
+  final _pinterestUrlController = TextEditingController();
+  final _linkedinUrlController = TextEditingController();
+  final _websiteUrlController = TextEditingController();
 
   // Controladores de tempo para cada dia da semana
   final Map<String, TextEditingController> _openingTimeControllers = {
@@ -65,7 +73,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
       {"tipo": "Elevadores", "status": false},
       {"tipo": "Portas Largas", "status": false},
       {"tipo": "Banheiros Adaptados", "status": false},
-      {"tipo": "Pisos e Superfícies Anti-derrapantes", "status": false},
+      {"tipo": "Pisos Táteis e Superfícies Anti-derrapantes", "status": false},
       {"tipo": "Estacionamento Reservado", "status": false}
     ],
     "Acessibilidade Comunicacional": [
@@ -98,10 +106,24 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
       emailController: _emailController,
       cnpjController: _cnpjController,
       phoneController: _phoneController,
+      addressController: _addressController,
+      numberController: _numberController,
+      neighborhoodController: _neighborhoodController,
+      cityController: _cityController,
+      stateController: _stateController,
+      zipCodeController: _cepController,
       aboutController: _aboutController,
       passwordController: _passwordController,
       confirmPasswordController: _confirmPasswordController,
       workingHoursController: _workingHoursController,
+      instagramUrlController: _instagramUrlController,
+      facebookUrlController: _facebookUrlController,
+      twitterUrlController: _twitterUrlController,
+      youtubeUrlController: _youtubeUrlController,
+      tiktokUrlController: _tiktokUrlController,
+      pinterestUrlController: _pinterestUrlController,
+      linkedinUrlController: _linkedinUrlController,
+      websiteUrlController: _websiteUrlController,
     );
   }
 
@@ -121,6 +143,14 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
     _cityController.dispose();
     _stateController.dispose();
     _workingHoursController.dispose();
+    _instagramUrlController.dispose();
+    _facebookUrlController.dispose();
+    _twitterUrlController.dispose();
+    _youtubeUrlController.dispose();
+    _tiktokUrlController.dispose();
+    _pinterestUrlController.dispose();
+    _linkedinUrlController.dispose();
+    _websiteUrlController.dispose();
     for (var controller in _openingTimeControllers.values) {
       controller.dispose();
     }
@@ -212,7 +242,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
         CircleAvatar(
           radius: 15,
           backgroundColor: _currentStep == stepIndex
-              ? AppColors.lightPurple
+              ? Theme.of(context).colorScheme.primary
               : AppColors.lightGray.withOpacity(0.3),
           child: Text(
             (stepIndex + 1).toString(),
@@ -323,15 +353,15 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
                             onPressed: _onStepCancel,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              side: const BorderSide(
-                                color: AppColors.lightPurple,
+                              side: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
                                 width: 2,
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Voltar',
                               style: TextStyle(
-                                color: AppColors.lightPurple,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppTypography.large,
                               ),
@@ -361,12 +391,12 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.lightPurple,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
                             ),
                             child: const Text(
                               'Concluir',
                               style: TextStyle(
-                                color: AppColors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppTypography.large,
                               ),
@@ -376,12 +406,13 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
                           ElevatedButton(
                             onPressed: _onStepContinue,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.lightPurple,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
                             ),
-                            child: const Text(
+                            child: Text(
                               'Próximo',
                               style: TextStyle(
-                                color: AppColors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppTypography.large,
                               ),
@@ -647,16 +678,16 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
             onPressed: _clearWorkingHours,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.white,
-              side: const BorderSide(
-                color: AppColors.lightPurple,
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
                 width: 2,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
+            child: Text(
               'Limpar Horários',
               style: TextStyle(
-                color: AppColors.lightPurple,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: AppTypography.small,
               ),
@@ -849,8 +880,8 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
                     item["status"] = value ?? false;
                   });
                 },
-                activeColor: AppColors.lightPurple,
-                checkColor: AppColors.white,
+                activeColor: Theme.of(context).colorScheme.primary,
+                checkColor: Theme.of(context).colorScheme.onPrimary,
               );
             }).toList(),
           );

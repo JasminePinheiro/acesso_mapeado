@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:acesso_mapeado/shared/mock_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:acesso_mapeado/widgets/color_blind_image.dart';
+
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
@@ -15,6 +15,7 @@ import 'package:acesso_mapeado/shared/app_navbar.dart';
 import 'package:acesso_mapeado/widgets/accessibility_sheet.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:acesso_mapeado/widgets/companies_map_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,6 +28,8 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
 
   List<CompanyModel> filteredCompanies = [];
+  bool _showMapView = false;
+
   @override
   void initState() {
     getCompanies();
@@ -64,10 +67,15 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> getCompanies() async {
     try {
-      companies = await _companyController.getAllCompanies();
+      companies = await Provider.of<CompanyController>(context, listen: false)
+          .getAllCompanies();
       Logger.logInfo("Empresas carregadas: ${companies.length}");
 
       if (!mounted) return;
+
+      // Sort companies by distance
+      sortCompaniesByDistance();
+
       Provider.of<CompanyController>(context, listen: false)
           .updateCompanies(companies);
       filteredCompanies = companies;
@@ -79,6 +87,36 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Erro ao carregar empresas.')),
       );
+    }
+  }
+
+  // Add this new method to sort companies by distance
+  void sortCompaniesByDistance() {
+    final userPosition =
+        Provider.of<UserController>(context, listen: false).userPosition;
+
+    if (userPosition != null) {
+      companies.sort((a, b) {
+        double? distanceA = (a.latitude != null && a.longitude != null)
+            ? Geolocator.distanceBetween(
+                userPosition.latitude,
+                userPosition.longitude,
+                a.latitude!,
+                a.longitude!,
+              )
+            : double.infinity;
+
+        double? distanceB = (b.latitude != null && b.longitude != null)
+            ? Geolocator.distanceBetween(
+                userPosition.latitude,
+                userPosition.longitude,
+                b.latitude!,
+                b.longitude!,
+              )
+            : double.infinity;
+
+        return distanceA.compareTo(distanceB);
+      });
     }
   }
 
@@ -104,9 +142,10 @@ class _HomePageState extends State<HomePage> {
   void _onSearchChanged() {
     String searchTerm = _searchController.text.toLowerCase();
     setState(() {
-      filteredCompanies = companies.where((company) {
-        return company.name.toLowerCase().contains(searchTerm);
-      }).toList();
+      filteredCompanies = companies
+          .where((company) => company.name.toLowerCase().contains(searchTerm))
+          .toList();
+      sortCompaniesByDistance(); // Keep the sort when filtering
     });
   }
 
@@ -161,11 +200,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  final CompanyController _companyController = CompanyController(
-    auth: FirebaseAuth.instance,
-    firestore: FirebaseFirestore.instance,
-  );
-
   int _selectedIndex = 0;
 
   List<CompanyModel> companies = [];
@@ -176,128 +210,141 @@ class _HomePageState extends State<HomePage> {
     'Perfil',
   ];
 
-  // Métodos para construir cada página
-  Widget _buildHomePage(CompanyController companyController) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 14),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              labelText: "Pesquisar",
-              hintText: "Digite o nome da empresa",
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0))),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Expanded(
-          child: filteredCompanies.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Nenhuma empresa encontrada.',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Color.fromARGB(255, 225, 225, 225),
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: filteredCompanies.length,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemBuilder: (context, index) {
-                    final company = filteredCompanies[index];
-                    final distance =
-                        calculateDistance(company.latitude, company.longitude);
-
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      elevation: 4,
-                      margin: const EdgeInsets.only(bottom: 12.0),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: company.imageUrl != null
-                              ? MemoryImage(
-                                  base64Decode(company.imageUrl!.split(',')[1]))
-                              : const AssetImage(
-                                      'assets/images/img-company.png')
-                                  as ImageProvider,
-                          radius: 25,
-                        ),
-                        title: Text(
-                          company.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        subtitle: Row(
-                          children: List.generate(5, (starIndex) {
-                            return Icon(
-                              Icons.star,
-                              color: starIndex < (company.rating ?? 0)
-                                  ? AppColors.yellow
-                                  : Colors.grey[300],
-                              size: AppTypography.xxLarge,
-                            );
-                          }),
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              distance,
-                              style: const TextStyle(
-                                color: Color.fromARGB(255, 203, 5, 128),
-                                fontWeight: FontWeight.bold,
-                                fontSize: AppTypography.medium,
-                              ),
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-                          _showAccessibilitySheet(company);
-                        },
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRankingPage() {
-    return const RankingPage();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final companyState = Provider.of<CompanyController>(context);
     return Scaffold(
-      appBar: homeAppBar(),
-      backgroundColor: AppColors.white,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          _buildHomePage(companyState),
-          _buildRankingPage(),
-          const ProfileUserPage()
+      appBar: AppBar(
+        title: Text(indexTitle[_selectedIndex]),
+        actions: [
+          if (_selectedIndex == 0)
+            IconButton(
+              icon: Icon(_showMapView ? Icons.list : Icons.map),
+              onPressed: () {
+                setState(() {
+                  _showMapView = !_showMapView;
+                });
+              },
+            ),
         ],
       ),
       drawer: _selectedIndex == 0 ? homeDrawer(context) : null,
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          _buildHomeContent(),
+          const RankingPage(),
+          const ProfileUserPage(),
+        ],
+      ),
       bottomNavigationBar: AppNavbar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
       ),
+    );
+  }
+
+  Widget _buildHomeContent() {
+    return Column(
+      children: [
+        if (!_showMapView) ...[
+          const SizedBox(height: 14),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                labelText: "Pesquisar",
+                hintText: "Digite o nome da empresa",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0))),
+              ),
+            ),
+          ),
+        ],
+        Expanded(
+          child: _showMapView
+              ? CompaniesMapView(companies: filteredCompanies)
+              : filteredCompanies.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'Nenhuma empresa encontrada.',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Color.fromARGB(255, 225, 225, 225),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredCompanies.length,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemBuilder: (context, index) {
+                        final company = filteredCompanies[index];
+                        final distance = calculateDistance(
+                            company.latitude, company.longitude);
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          elevation: 4,
+                          margin: const EdgeInsets.only(bottom: 12.0),
+                          child: ListTile(
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(64),
+                              child: ColorBlindImage(
+                                imageProvider: company.imageUrl != null
+                                    ? MemoryImage(base64Decode(
+                                        company.imageUrl!.split(',')[1]))
+                                    : const AssetImage(
+                                            'assets/images/img-company.png')
+                                        as ImageProvider,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            title: Text(
+                              company.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Row(
+                              children: List.generate(5, (starIndex) {
+                                return Icon(
+                                  Icons.star,
+                                  color: starIndex < (company.rating ?? 0)
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.grey[300],
+                                  size: AppTypography.xxLarge,
+                                );
+                              }),
+                            ),
+                            trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  distance,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: AppTypography.medium,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              _showAccessibilitySheet(company);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+        ),
+      ],
     );
   }
 
@@ -314,8 +361,7 @@ class _HomePageState extends State<HomePage> {
             return ExpansionTile(
               title: Text(
                 category,
-                style: const TextStyle(
-                    color: AppColors.black, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               children: items.map((item) {
                 return CheckboxListTile(
@@ -329,8 +375,7 @@ class _HomePageState extends State<HomePage> {
                       item["status"] = value ?? false;
                     });
                   },
-                  activeColor: AppColors.lightPurple,
-                  checkColor: AppColors.white,
+                  activeColor: Theme.of(context).colorScheme.primary,
                 );
               }).toList(),
             );
@@ -346,7 +391,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.lightPurple,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 12.0),
                   textStyle: const TextStyle(
@@ -359,36 +404,34 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  AppBar homeAppBar() {
-    return AppBar(
-      title: Text(
-        indexTitle[_selectedIndex],
-      ),
-      backgroundColor: AppColors.white,
-      leading: _selectedIndex != 0
-          ? IconButton(
-              icon: Image.asset('assets/icons/arrow-left.png'),
-              onPressed: () {
-                setState(() {
-                  _selectedIndex = 0;
-                });
-              },
-            )
-          : null,
-      flexibleSpace: Container(
-        decoration: BoxDecoration(color: AppColors.white, boxShadow: [
-          BoxShadow(
-            color: AppColors.darkGray.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextButton(
+                onPressed: () {
+                  setState(() {
+                    // Reset all checkboxes to false
+                    for (var entry in accessibilityData.entries) {
+                      for (var item in entry.value) {
+                        item["status"] = false;
+                      }
+                    }
+                  });
+                  filterCompanies();
+                  Navigator.pop(context);
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 12.0),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                child: const Text('Limpar filtros'),
+              ),
+            ),
           ),
-        ]),
+        ],
       ),
     );
   }
