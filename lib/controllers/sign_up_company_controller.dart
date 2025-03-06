@@ -1,14 +1,15 @@
+import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
+
 import 'package:acesso_mapeado/pages/company_home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:uuid/uuid.dart';
+import 'package:provider/provider.dart';
 
 class SignUpCompanyController {
   final GlobalKey<FormState> formKey;
@@ -23,8 +24,6 @@ class SignUpCompanyController {
   final TextEditingController stateController;
   final TextEditingController zipCodeController;
   final TextEditingController aboutController;
-  final TextEditingController passwordController;
-  final TextEditingController confirmPasswordController;
   final TextEditingController workingHoursController;
   final TextEditingController instagramUrlController;
   final TextEditingController facebookUrlController;
@@ -48,8 +47,6 @@ class SignUpCompanyController {
     required this.stateController,
     required this.zipCodeController,
     required this.aboutController,
-    required this.passwordController,
-    required this.confirmPasswordController,
     required this.workingHoursController,
     required this.instagramUrlController,
     required this.facebookUrlController,
@@ -89,43 +86,15 @@ class SignUpCompanyController {
     return numbers[13] == digit2;
   }
 
-  bool isValidPassword(String password) {
-    final passwordRegex = RegExp(
-        r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
-    return passwordRegex.hasMatch(password);
-  }
-
   Future<void> signUp(
     BuildContext context,
     Map<String, List<Map<String, dynamic>>> accessibilityData,
     String fullAddress,
-    Map<String, Map<String, String>> workingHoursData, // Novo parâmetro
+    Map<String, Map<String, String>> workingHoursData,
   ) async {
     if (formKey.currentState!.validate()) {
-      if (!isValidPassword(passwordController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'A senha deve conter no mínimo 8 caracteres, incluindo:\n'
-              '- Uma letra maiúscula\n'
-              '- Uma letra minúscula\n'
-              '- Um número\n'
-              '- Um caractere especial',
-            ),
-          ),
-        );
-        return;
-      }
-
-      if (passwordController.text != confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('As senhas não correspondem')),
-        );
-        return;
-      }
-
       try {
-        // Verificar se o CNPJ já existe no Firestore
+        // Check if CNPJ already exists
         final cnpj = cnpjController.text.replaceAll(RegExp(r'\D'), '');
         final querySnapshot = await FirebaseFirestore.instance
             .collection('companies')
@@ -139,13 +108,8 @@ class SignUpCompanyController {
           return;
         }
 
-        UserCredential userCredential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
-
-        final user = userCredential.user;
+        final user = Provider.of<UserController>(context, listen: false).user;
+        String sharedId = user!.uid;
 
         Map<String, List<AccessibilityItem>> selectedAccessibility = {};
 
@@ -191,7 +155,7 @@ class SignUpCompanyController {
         LatLng? latLong = await getLatLong(fullAddress);
 
         CompanyModel newCompany = CompanyModel(
-          uuid: const Uuid().v4(),
+          uuid: sharedId,
           name: nameController.text,
           email: emailController.text,
           cnpj: cnpjController.text.replaceAll(RegExp(r'\D'), ''),
@@ -225,11 +189,8 @@ class SignUpCompanyController {
 
         await FirebaseFirestore.instance
             .collection('companies')
-            .doc(user!.uid)
-            .set(newCompany.toJson())
-            .catchError((error) {
-          Logger.logInfo('Erro ao adicionar empresa ao Firestore: $error');
-        });
+            .doc(sharedId)
+            .set(newCompany.toJson());
 
         Logger.logInfo("Empresa adicionada com sucesso");
 
@@ -241,16 +202,10 @@ class SignUpCompanyController {
           context,
           MaterialPageRoute(builder: (context) => const CompanyHomePage()),
         );
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erro: e-mail já cadastrado')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Erro ao cadastrar')),
-          );
-        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao cadastrar: ${e.toString()}')),
+        );
       }
     }
   }
